@@ -1,0 +1,147 @@
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to bottom right, #ebf8ff, #a3b8f4); /* Fondo degradado */
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Centrado de la página */
+.flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.min-h-screen {
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 100%;
+    padding: 20px;
+}
+
+/* Estilos para la tarjeta de login */
+.bg-white {
+    background-color: white;
+}
+
+.p-6 {
+    padding: 20px;
+}
+
+.rounded-lg {
+    border-radius: 10px;
+}
+
+.shadow-lg {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mb-6 {
+    margin-bottom: 24px;
+}
+
+.mb-4 {
+    margin-bottom: 16px;
+}
+
+/* Estilos de los encabezados */
+h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+p {
+    color: #777;
+}
+
+/* Estilos para el formulario */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+input {
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+label {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Estilos para los botones */
+button {
+    padding: 15px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.bg-green-600 {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.bg-green-600:hover {
+    background-color: #45a049;
+}
+
+/* Estilos para los mensajes de error */
+#errorMessage {
+    background-color: #ffcccc;
+    color: #e74c3c;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+#errorText {
+    margin: 0;
+}
+
+/* Enlaces */
+a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .max-w-md {
+        max-width: 90%;
+    }
+}
+
+@media (min-width: 768px) {
+    .max-w-md {
+        max-width: 400px;
+    }
+}

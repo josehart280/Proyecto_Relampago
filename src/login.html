@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Administrativo - Sistema de Becas</title>
+    <link href="css/login.css" rel="stylesheet">  <!-- Vínculo con el archivo CSS -->
+</head>
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-md">
+        <!-- Volver al index -->
+        <div class="mb-6">
+            <a href="index.html" class="inline-flex items-center text-green-600 hover:text-green-800">
+                <button class="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700">
+                    Volver al Inicio
+                </button>
+            </a>
+        </div>
+
+        <!-- Card de Login -->
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Acceso Administrativo</h2>
+                <p class="text-gray-600">Panel de administración del sistema de becas</p>
+            </div>
+
+            <!-- Formulario de Login -->
+            <form id="loginForm" class="space-y-4">
+                <!-- Campo de ID de Usuario -->
+                <div class="space-y-2">
+                    <label for="login" class="block text-gray-700 font-medium">ID de Usuario</label>
+                    <input
+                        type="text"
+                        id="login"
+                        name="login"
+                        class="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                        placeholder="ID de Usuario"
+                    />
+                </div>
+
+                <!-- Campo de Contraseña -->
+                <div class="space-y-2">
+                    <label for="password" class="block text-gray-700 font-medium">Contraseña</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                        placeholder="Contraseña administrativa"
+                    />
+                </div>
+
+                <!-- Mensaje de error o éxito -->
+                <div id="errorMessage" class="hidden bg-red-100 text-red-700 p-2 rounded-md">
+                    <p id="errorText">Credenciales incorrectas.</p>
+                </div>
+
+                <!-- Botón de Iniciar Sesión -->
+                <button type="submit" id="submitButton" class="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700">
+                    Acceder al Sistema
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Vincular el archivo de JavaScript -->
+    <script src="js/login.js"></script>
+
+</body>
+</html>
