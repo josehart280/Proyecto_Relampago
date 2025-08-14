@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrativo - Sistema de Becas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/dashboar_admin.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Panel Administrativo - Becas</h1>
+            <div class="flex items-center gap-4">
+                <span>Admin: Juan Pérez</span>
+                <button onclick="logout()" class="bg-blue-700 px-3 py-1 rounded hover:bg-blue-800">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Filtros -->
+    <div class="container mx-auto p-6">
+        <div class="bg-white rounded-lg shadow p-4 mb-6">
+            <div class="flex flex-wrap gap-4 items-center">
+                <select id="statusFilter" class="border rounded px-3 py-2">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="en-revision">En Revisión</option>
+                    <option value="aprobada">Aprobada</option>
+                    <option value="rechazada">Rechazada</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="Buscar por nombre o cédula..." 
+                       class="border rounded px-3 py-2 flex-1 min-w-64">
+                <button onclick="applyFilters()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Filtrar
+                </button>
+            </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-medium text-gray-500">Total Solicitudes</h3>
+                <p class="text-2xl font-bold text-gray-900" id="totalSolicitudes">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-medium text-gray-500">Pendientes</h3>
+                <p class="text-2xl font-bold text-yellow-600" id="pendientes">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-medium text-gray-500">Aprobadas</h3>
+                <p class="text-2xl font-bold text-green-600" id="aprobadas">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm font-medium text-gray-500">Rechazadas</h3>
+                <p class="text-2xl font-bold text-red-600" id="rechazadas">0</p>
+            </div>
+        </div>
+
+        <!-- Tarjetas de Solicitudes -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="solicitudesContainer">
+            <!-- Las tarjetas se generarán dinámicamente -->
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content w-full max-w-4xl p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Detalles de la Solicitud</h2>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div id="modalContent">
+                <!-- Contenido del modal se carga dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        const solicitudes = [
+            {
+                id: 1,
+                nombre: "María González Rodríguez",
+                cedula: "1-1234-5678",
+                carrera: "Ingeniería en Sistemas",
+                estado: "pendiente",
+                fechaSolicitud: "2024-01-15",
+                telefono: "8888-9999",
+                email: "maria.gonzalez@email.com",
+                direccion: "San José, Costa Rica",
+                ingresoFamiliar: 450000,
+                miembrosFamilia: 4,
+                documentos: ["Cédula", "Orden Patronal", "Constancia Salario"]
+            },
+            {
+                id: 2,
+                nombre: "Carlos Jiménez Mora",
+                cedula: "2-2345-6789",
+                carrera: "Administración de Empresas",
+                estado: "en-revision",
+                fechaSolicitud: "2024-01-10",
+                telefono: "7777-8888",
+                email: "carlos.jimenez@email.com",
+                direccion: "Cartago, Costa Rica",
+                ingresoFamiliar: 380000,
+                miembrosFamilia: 3,
+                documentos: ["Cédula", "Orden Patronal", "Constancia Salario", "Recibo Alquiler"]
+            },
+            {
+                id: 3,
+                nombre: "Ana Vargas Castro",
+                cedula: "3-3456-7890",
+                carrera: "Contaduría Pública",
+                estado: "aprobada",
+                fechaSolicitud: "2024-01-05",
+                telefono: "6666-7777",
+                email: "ana.vargas@email.com",
+                direccion: "Alajuela, Costa Rica",
+                ingresoFamiliar: 320000,
+                miembrosFamilia: 5,
+                documentos: ["Cédula", "Orden Patronal", "Constancia Salario"],
+                montoAprobado: 150000,
+                motivoDecision: "Cumple con todos los requisitos socioeconómicos"
+            },
+            {
+                id: 4,
+                nombre: "Luis Herrera Solís",
+                cedula: "4-4567-8901",
+                carrera: "Turismo",
+                estado: "rechazada",
+                fechaSolicitud: "2024-01-08",
+                telefono: "5555-6666",
+                email: "luis.herrera@email.com",
+                direccion: "Puntarenas, Costa Rica",
+                ingresoFamiliar: 650000,
+                miembrosFamilia: 2,
+                documentos: ["Cédula", "Orden Patronal"],
+                motivoDecision: "Ingresos familiares superan el límite establecido"
+            }
+        ];
+
+        let solicitudesFiltradas = [...solicitudes];
+
+        // Función para obtener el color del estado
+        function getStatusColor(estado) {
+            switch(estado) {
+                case 'pendiente': return 'bg-yellow-100 text-yellow-800';
+                case 'en-revision': return 'bg-blue-100 text-blue-800';
+                case 'aprobada': return 'bg-green-100 text-green-800';
+                case 'rechazada': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        // Función para renderizar las tarjetas
+        function renderSolicitudes() {
+            const container = document.getElementById('solicitudesContainer');
+            container.innerHTML = '';
+
+            solicitudesFiltradas.forEach(solicitud => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer';
+                card.onclick = () => openModal(solicitud);
+                
+                card.innerHTML = `
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-gray-900">${solicitud.nombre}</h3>
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(solicitud.estado)}">
+                                ${solicitud.estado.charAt(0).toUpperCase() + solicitud.estado.slice(1)}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-1">Cédula: ${solicitud.cedula}</p>
+                        <p class="text-sm text-gray-600 mb-1">Carrera: ${solicitud.carrera}</p>
+                        <p class="text-sm text-gray-600 mb-3">Fecha: ${solicitud.fechaSolicitud}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-500">${solicitud.documentos.length} documentos</span>
+                            <span class="text-xs text-gray-500">₡${solicitud.ingresoFamiliar.toLocaleString()}</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+
+            updateStats();
+        }
+
+        // Función para actualizar estadísticas
+        function updateStats() {
+            document.getElementById('totalSolicitudes').textContent = solicitudesFiltradas.length;
+            document.getElementById('pendientes').textContent = solicitudesFiltradas.filter(s => s.estado === 'pendiente').length;
+            document.getElementById('aprobadas').textContent = solicitudesFiltradas.filter(s => s.estado === 'aprobada').length;
+            document.getElementById('rechazadas').textContent = solicitudesFiltradas.filter(s => s.estado === 'rechazada').length;
+        }
+
+        // Función para abrir modal
+        function openModal(solicitud) {
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('modalContent');
+            
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Información Personal -->
+                    <div class="border-b pb-4">
+                        <h3 class="text-lg font-semibold mb-3">Información Personal</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Nombre Completo</label>
+                                <p class="text-sm text-gray-900">${solicitud.nombre}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Cédula</label>
+                                <p class="text-sm text-gray-900">${solicitud.cedula}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Carrera</label>
+                                <p class="text-sm text-gray-900">${solicitud.carrera}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Teléfono</label>
+                                <p class="text-sm text-gray-900">${solicitud.telefono}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Email</label>
+                                <p class="text-sm text-gray-900">${solicitud.email}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Dirección</label>
+                                <p class="text-sm text-gray-900">${solicitud.direccion}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información Socioeconómica -->
+                    <div class="border-b pb-4">
+                        <h3 class="text-lg font-semibold mb-3">Información Socioeconómica</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Ingreso Familiar Mensual</label>
+                                <p class="text-sm text-gray-900">₡${solicitud.ingresoFamiliar.toLocaleString()}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Miembros de la Familia</label>
+                                <p class="text-sm text-gray-900">${solicitud.miembrosFamilia} personas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Documentos -->
+                    <div class="border-b pb-4">
+                        <h3 class="text-lg font-semibold mb-3">Documentos Adjuntos</h3>
+                        <div class="flex flex-wrap gap-2">
+                            ${solicitud.documentos.map(doc => 
+                                `<span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">${doc}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Estado y Decisión -->
+                    <div class="border-b pb-4">
+                        <h3 class="text-lg font-semibold mb-3">Estado de la Solicitud</h3>
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(solicitud.estado)}">
+                                ${solicitud.estado.charAt(0).toUpperCase() + solicitud.estado.slice(1)}
+                            </span>
+                            <span class="text-sm text-gray-600">Fecha de solicitud: ${solicitud.fechaSolicitud}</span>
+                        </div>
+                        
+                        ${solicitud.estado === 'aprobada' ? `
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h4 class="font-medium text-green-800 mb-2">Beca Aprobada</h4>
+                                <p class="text-sm text-green-700 mb-1">Monto: ₡${solicitud.montoAprobado.toLocaleString()}</p>
+                                <p class="text-sm text-green-700 mb-1">Plazo: 1 año</p>
+                                <p class="text-sm text-green-700">Motivo: ${solicitud.motivoDecision}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${solicitud.estado === 'rechazada' ? `
+                            <div class="bg-red-50 p-4 rounded-lg">
+                                <h4 class="font-medium text-red-800 mb-2">Solicitud Rechazada</h4>
+                                <p class="text-sm text-red-700">Motivo: ${solicitud.motivoDecision}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Acciones -->
+                    ${solicitud.estado === 'pendiente' || solicitud.estado === 'en-revision' ? `
+                        <div class="flex gap-4">
+                            <button onclick="aprobarSolicitud(${solicitud.id})" 
+                                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                                Aprobar
+                            </button>
+                            <button onclick="rechazarSolicitud(${solicitud.id})" 
+                                    class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                                Rechazar
+                            </button>
+                            <button onclick="cambiarEstado(${solicitud.id}, 'en-revision')" 
+                                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                                Marcar en Revisión
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            modal.classList.add('show');
+        }
+
+        // Función para cerrar modal
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('show');
+        }
+
+        // Función para aplicar filtros
+        function applyFilters() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            solicitudesFiltradas = solicitudes.filter(solicitud => {
+                const matchesStatus = !statusFilter || solicitud.estado === statusFilter;
+                const matchesSearch = !searchTerm || 
+                    solicitud.nombre.toLowerCase().includes(searchTerm) ||
+                    solicitud.cedula.includes(searchTerm);
+                
+                return matchesStatus && matchesSearch;
+            });
+            
+            renderSolicitudes();
+        }
+
+        // Funciones para cambiar estado
+        function aprobarSolicitud(id) {
+            const monto = prompt('Ingrese el monto de la beca:');
+            if (monto) {
+                const solicitud = solicitudes.find(s => s.id === id);
+                solicitud.estado = 'aprobada';
+                solicitud.montoAprobado = parseInt(monto);
+                solicitud.motivoDecision = 'Cumple con todos los requisitos socioeconómicos';
+                closeModal();
+                renderSolicitudes();
+                alert('Solicitud aprobada exitosamente');
+            }
+        }
+
+        function rechazarSolicitud(id) {
+            const motivo = prompt('Ingrese el motivo del rechazo:');
+            if (motivo) {
+                const solicitud = solicitudes.find(s => s.id === id);
+                solicitud.estado = 'rechazada';
+                solicitud.motivoDecision = motivo;
+                closeModal();
+                renderSolicitudes();
+                alert('Solicitud rechazada');
+            }
+        }
+
+        function cambiarEstado(id, nuevoEstado) {
+            const solicitud = solicitudes.find(s => s.id === id);
+            solicitud.estado = nuevoEstado;
+            closeModal();
+            renderSolicitudes();
+            alert(`Estado cambiado a: ${nuevoEstado}`);
+        }
+
+        function logout() {
+            if (confirm('¿Está seguro que desea cerrar sesión?')) {
+                alert('Sesión cerrada');
+                // Aquí redirigiría al login
+            }
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            renderSolicitudes();
+            
+            // Event listeners para filtros en tiempo real
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            document.getElementById('statusFilter').addEventListener('change', applyFilters);
+        });
+    </script>
+</body>
+</html>
