@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Administrativo - Sistema de Becas</title>
+    <link href="css/login.css" rel="stylesheet">  <!-- Vínculo con el archivo CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Incluir SweetAlert2 -->
+</head>
+<body>
+
+    <div class="w-full">
+        <!-- Botón de Volver al Inicio -->
+        <div class="mb-6">
+            <a href="index.html" class="inline-flex items-center text-green-600 hover:text-green-800">
+                <button class="bg-green-600 text-white py-3 rounded-md hover:bg-green-700">
+                    Volver al Inicio
+                </button>
+            </a>
+        </div>
+
+        <!-- Card de Login -->
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="text-center mb-6">
+                <h2>Acceso Administrativo</h2>
+                <p class="text-gray-600">Panel de administración del sistema de becas</p>
+            </div>
+
+            <!-- Formulario de Login -->
+            <form id="loginForm" class="space-y-4">
+                <!-- Campo de ID de Usuario -->
+                <div class="space-y-2">
+                    <label for="login" class="block text-gray-700 font-medium">ID de Usuario</label>
+                    <input
+                        type="text"
+                        id="login"
+                        name="login"
+                        class="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                        placeholder="ID de Usuario"
+                    />
+                </div>
+
+                <!-- Campo de Contraseña -->
+                <div class="space-y-2">
+                    <label for="password" class="block text-gray-700 font-medium">Contraseña</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                        placeholder="Contraseña administrativa"
+                    />
+                </div>
+
+                <!-- Botón de Iniciar Sesión -->
+                <button type="submit" id="submitButton" class="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700">
+                    Acceder al Sistema
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript directamente incrustado -->
+    <script>
+    // Obtén los elementos del formulario
+    const loginForm = document.getElementById('loginForm');
+
+    // Lógica de login
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Prevenir que el formulario se envíe de forma tradicional
+
+        const login = e.target.login.value; // ID de usuario
+        const password = e.target.password.value; // Contraseña
+
+        // Enviar los datos al servidor
+        const response = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                login: login, 
+                passUsuario: password,
+            })
+        });
+
+        const data = await response.json();
+
+        // Si la respuesta es exitosa (status 200)
+        if (response.ok) {
+            // Mostrar notificación de éxito con SweetAlert2
+            Swal.fire({
+                title: 'Login Exitoso',
+                text: data.message,  // Mensaje que devuelve el servidor
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+            }).then(() => {
+                // Redirigir al usuario dependiendo del rol
+                if (data.message.includes('Redirigiendo a la página de estudiante')) {
+                    window.location.href = 'estudiante.html';  // Redirige a la página de estudiante
+                } else if (data.message.includes('Redirigiendo a la página de administrador')) {
+                    window.location.href = 'administrador.html';  // Redirige a la página de administrador
+                } else if (data.message.includes('Redirigiendo a la página de aprobador')) {
+                    window.location.href = 'aprobador.html';  // Redirige a la página de aprobador
+                }
+            });
+        } else {
+            // Si las credenciales son incorrectas, mostrar la notificación de error con SweetAlert2
+            Swal.fire({
+                title: 'Error',
+                text: data.message || 'Credenciales incorrectas',  // Si el mensaje de error no es específico, mostramos uno por defecto
+                icon: 'error',
+                confirmButtonText: 'Intentar de nuevo'
+            });
+        }
+    });
+    </script>
+
+</body>
+</html>

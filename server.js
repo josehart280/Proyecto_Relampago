@@ -1,7 +1,7 @@
-require('dotenv').config();
-const app = require('./app');
-const PORT = process.env.PORT || 3000;
+const app = require('./app');  // Asegúrate de que este import esté correcto
+const port = process.env.PORT || 3000;  // Puerto por defecto
 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+// Iniciar el servidor
+app.listen(port, () => {
+  console.log(`Servidor corriendo en el puerto ${port}`);
 });
