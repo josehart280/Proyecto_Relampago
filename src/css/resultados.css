@@ -1,0 +1,158 @@
+/* General */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background: linear-gradient(145deg, #a8c0ff, #3f82f2);
+    color: #333;
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100vh;
+}
+
+/* Container */
+.container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Title */
+.text-center {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.text-3xl {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2d2d2d;
+}
+
+.text-gray-600 {
+    color: #4b5563;
+}
+
+/* Input and Button */
+input,
+button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+input:focus,
+button:focus {
+    outline: none;
+    border-color: #6c7bff;
+}
+
+input {
+    background-color: #f9f9f9;
+}
+
+button {
+    background-color: #6c7bff;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #4c5bb5;
+}
+
+/* Result Card */
+.card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.card .title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.card .badge {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.card .badge.approved {
+    background-color: #4caf50;
+    color: white;
+}
+
+.card .badge.rejected {
+    background-color: #f44336;
+    color: white;
+}
+
+.card .details {
+    margin-top: 16px;
+}
+
+.card .details div {
+    margin-bottom: 12px;
+}
+
+.card .details .label {
+    font-weight: 600;
+    color: #333;
+}
+
+.card .details .value {
+    color: #777;
+}
+
+.card .details .amount {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #4caf50;
+}
+
+.card .details .date {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+/* Back Button */
+button.back {
+    width: 150px;
+    margin: 20px auto;
+    background-color: #cccccc;
+    color: #333;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 10px;
+    display: block;
+    text-align: center;
+}
+
+button.back:hover {
+    background-color: #a0a0a0;
+}
+
+/* SweetAlert2 Styling */
+.swal2-popup {
+    font-family: 'Roboto', sans-serif;
+}

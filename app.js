@@ -1,261 +1,35 @@
 const express = require('express');
 const path = require('path');
-
 const cors = require('cors'); // Importamos CORS
 const { sql, connectToDatabase } = require('./db'); // Importar la conexión a la base de datos
 const app = express();
-
+ 
 // Usar CORS para permitir solicitudes desde cualquier origen
 app.use(cors());  // Esto habilita CORS para todas las rutas
-
+ 
 // Middlewares básicos
-
-const mysql = require('mysql2');
-require('dotenv').config();
-
-const app = express();
-
-// Configuración CORS
-const cors = require('cors');
-app.use(cors());
-
-// Middlewares
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'src')));
-
-
+ 
 // Conectar a la base de datos
 connectToDatabase();
-
-// Conexión a la base de datos
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  connectionLimit: process.env.DB_CONNECTION_LIMIT,
+ 
+// Ruta para el frontend
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'index.html'));
 });
-
-// Función para ejecutar consultas SQL
-function executeQuery(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    pool.query(sql, params, (err, results) => {
-      if (err) return reject(err);
-      resolve(results);
-    });
-  });
-}
-
-// Login
-function loginUsuario(idUsuario, passUsuario, callback) {
-  const sql = 'CALL login_usuario(?, ?)';
-  pool.query(sql, [idUsuario, passUsuario], (err, results) => {
-    if (err) {
-      console.error('Error al ejecutar el procedimiento almacenado:', err);
-      return callback(err, null);
-    }
-    callback(null, results[0][0].resultado);
-  });
-}
-
-app.post('/login', (req, res) => {
-  const { login, passUsuario } = req.body;
-  loginUsuario(login, passUsuario, (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: 'Hubo un error en el login' });
-    }
-    if (result.includes('Redirigiendo')) {
-      res.json({ message: result });
-    } else {
-      res.status(401).json({ message: result });
-    }
-  });
-});
-
-// Endpoints para el dashboard administrativo
-
-// Obtener todas las solicitudes
-app.get('/api/solicitudes', async (req, res) => {
-  try {
-    const { estado, search } = req.query;
-   
-    let sql = `
-      SELECT s.*, u.nombre, u.apellido1, u.apellido2, u.cedula, u.telefono, u.email, u.direccion,
-             e.notaPromedio, e.Beca
-      FROM solicitudes s
-      JOIN estudiantes e ON s.idEstudiante = e.idEstudiante
-      JOIN usuarios u ON e.idEstudiante = u.idUsuario
-    `;
-   
-    const params = [];
-   
-    if (estado) {
-      sql += ' WHERE s.estado = ?';
-      params.push(estado);
-    }
-   
-    if (search) {
-      sql += estado ? ' AND ' : ' WHERE ';
-      sql += '(u.nombre LIKE ? OR u.apellido1 LIKE ? OR u.apellido2 LIKE ? OR u.cedula LIKE ?)';
-      params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
-    }
-   
-    sql += ' ORDER BY s.fechaSolicitud DESC';
-   
-    const solicitudes = await executeQuery(sql, params);
-   
-    // Obtener documentos para cada solicitud
-    for (const solicitud of solicitudes) {
-      const documentos = await executeQuery(
-        'SELECT tipoDocumento FROM documentos WHERE idSolicitud = ?',
-        [solicitud.idSolicitud]
-      );
-      solicitud.documentos = documentos.map(d => d.tipoDocumento);
-     
-      // Obtener grupo familiar
-      const grupoFamiliar = await executeQuery(
-        'SELECT * FROM grupofamiliar WHERE idEstudiante = ?',
-        [solicitud.idEstudiante]
-      );
-      solicitud.grupoFamiliar = grupoFamiliar;
-     
-      // Calcular ingreso familiar total
-      const ingresoFamiliar = grupoFamiliar.reduce(
-        (total, miembro) => total + (miembro.ingreso_mensual || 0), 0
-      );
-      solicitud.ingresoFamiliar = ingresoFamiliar;
-      solicitud.miembrosFamilia = grupoFamiliar.length;
-    }
-   
-    res.json(solicitudes);
-  } catch (error) {
-    console.error('Error al obtener solicitudes:', error);
-    res.status(500).json({ error: 'Error al obtener solicitudes' });
-  }
-});
-
-// Obtener estadísticas de solicitudes
-app.get('/api/solicitudes/estadisticas', async (req, res) => {
-  try {
-    const sql = `
-      SELECT
-        COUNT(*) as total,
-        SUM(estado = 'pendiente') as pendientes,
-        SUM(estado = 'en-revision') as enRevision,
-        SUM(estado = 'aprobada') as aprobadas,
-        SUM(estado = 'rechazada') as rechazadas
-      FROM solicitudes
-    `;
-   
-    const [stats] = await executeQuery(sql);
-    res.json(stats);
-  } catch (error) {
-    console.error('Error al obtener estadísticas:', error);
-    res.status(500).json({ error: 'Error al obtener estadísticas' });
-  }
-});
-
-// Obtener detalles de una solicitud específica
-app.get('/api/solicitudes/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-   
-    const [solicitud] = await executeQuery(`
-      SELECT s.*, u.nombre, u.apellido1, u.apellido2, u.cedula, u.telefono, u.email, u.direccion,
-             e.notaPromedio, e.Beca
-      FROM solicitudes s
-      JOIN estudiantes e ON s.idEstudiante = e.idEstudiante
-      JOIN usuarios u ON e.idEstudiante = u.idUsuario
-      WHERE s.idSolicitud = ?
-    `, [id]);
-   
-    if (!solicitud) {
-      return res.status(404).json({ error: 'Solicitud no encontrada' });
-    }
-   
-    // Obtener documentos
-    const documentos = await executeQuery(
-      'SELECT tipoDocumento FROM documentos WHERE idSolicitud = ?',
-      [id]
-    );
-    solicitud.documentos = documentos.map(d => d.tipoDocumento);
-   
-    // Obtener grupo familiar
-    const grupoFamiliar = await executeQuery(
-      'SELECT * FROM grupofamiliar WHERE idEstudiante = ?',
-      [solicitud.idEstudiante]
-    );
-    solicitud.grupoFamiliar = grupoFamiliar;
-   
-    // Calcular ingreso familiar
-    const ingresoFamiliar = grupoFamiliar.reduce(
-      (total, miembro) => total + (miembro.ingreso_mensual || 0), 0
-    );
-    solicitud.ingresoFamiliar = ingresoFamiliar;
-    solicitud.miembrosFamilia = grupoFamiliar.length;
-   
-    res.json(solicitud);
-  } catch (error) {
-    console.error('Error al obtener solicitud:', error);
-    res.status(500).json({ error: 'Error al obtener solicitud' });
-  }
-});
-
-
-// Actualizar estado de una solicitud
-app.put('/api/solicitudes/:id/estado', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { estado, montoAprobado, motivoDecision } = req.body;
-   
-    // Validar estado
-    if (!['pendiente', 'en-revision', 'aprobada', 'rechazada'].includes(estado)) {
-      return res.status(400).json({ error: 'Estado no válido' });
-    }
-   
-    // Validar monto si es aprobada
-    if (estado === 'aprobada' && (!montoAprobado || isNaN(montoAprobado))) {
-      return res.status(400).json({ error: 'Monto aprobado requerido y debe ser numérico' });
-    }
-   
-    // Validar motivo si es rechazada
-    if (estado === 'rechazada' && !motivoDecision) {
-      return res.status(400).json({ error: 'Motivo de decisión requerido para rechazo' });
-    }
-   
-    const updateData = {
-      estado,
-      fechaDecision: estado === 'aprobada' || estado === 'rechazada' ? new Date() : null,
-      montoAprobado: estado === 'aprobada' ? montoAprobado : null,
-      motivoDecision: estado === 'rechazada' || estado === 'aprobada' ? motivoDecision : null
-    };
-   
-    await executeQuery(
-      'UPDATE solicitudes SET ? WHERE idSolicitud = ?',
-      [updateData, id]
-    );
-   
-    res.json({ message: 'Estado de solicitud actualizado correctamente' });
-  } catch (error) {
-    console.error('Error al actualizar estado:', error);
-    res.status(500).json({ error: 'Error al actualizar estado' });
-  }
-});
-
-
+ 
 // Ruta para manejar el login
 app.post('/login', async (req, res) => {
   const { login, passUsuario } = req.body;
-
+ 
   try {
     const result = await sql.query`EXEC ProyectoRelampago.login_usuario @p_idUsuario=${login}, @p_passUsuario=${passUsuario}`;
-
+ 
     if (result.recordset && result.recordset.length > 0) {
       const mensaje = result.recordset[0].resultado;
-
+ 
       if (mensaje.includes('Redirigiendo')) {
         res.json({ message: mensaje });
       } else {
@@ -270,55 +44,242 @@ app.post('/login', async (req, res) => {
   }
 });
 
+
+// Rutas API para el dashboard administrativo
+app.get('/api/solicitudes', async (req, res) => {
+  const { estado, search } = req.query;
+  
+  try {
+    // Primero verifica qué columnas existen realmente en tu base de datos
+    // Esta es una versión modificada que usa nombres de columnas más comunes
+    let query = `SELECT 
+  s.idSolicitud, s.idEstudiante, s.fechaSolicitud, s.estado, 
+  s.montoAprobado, s.fechaDecision, s.motivoDecision,
+  d.nombre as nombre, d.PrimerApellido as apellido1, d.SegundoApellido as apellido2,
+  d.CedulaDimex as cedula, d.telefonoCelular as telefono, 
+  d.correoElectronico as email, d.direccionExtra as direccion,
+  e.notaPromedio as notaPromedio, 
+  (SELECT SUM(ingreso_mensual) FROM ProyectoRelampago.grupofamiliar WHERE idEstudiante = s.idEstudiante) as ingresoFamiliar
+FROM ProyectoRelampago.Solicitudes s
+JOIN ProyectoRelampago.Estudiantes e ON s.idEstudiante = e.idEstudiante
+JOIN ProyectoRelampago.datossolicitante d ON s.idEstudiante = d.idEstudiante
+WHERE 1=1`;
+    
+    if (estado) query += ` AND s.estado = '${estado}'`;
+    if (search) {
+      query += ` AND (e.nombreEstudiante LIKE '%${search}%' OR e.apellidoEstudiante LIKE '%${search}%' OR e.cedulaEstudiante LIKE '%${search}%')`;
+    }
+    
+    const result = await sql.query(query);
+    
+    // Obtener documentos para cada solicitud (si la tabla Documentos existe)
+    const solicitudes = await Promise.all(result.recordset.map(async (solicitud) => {
+      let documentos = [];
+      try {
+        const docs = await sql.query`SELECT nombreDocumento FROM ProyectoRelampago.Documentos WHERE idSolicitud = ${solicitud.idSolicitud}`;
+        documentos = docs.recordset.map(d => d.nombreDocumento);
+      } catch (e) {
+        console.log("Tabla Documentos no encontrada o error al consultar");
+      }
+      
+      let grupoFamiliar = [];
+      try {
+        const familiares = await sql.query`SELECT * FROM ProyectoRelampago.GrupoFamiliar WHERE idEstudiante = ${solicitud.idEstudiante}`;
+        grupoFamiliar = familiares.recordset;
+      } catch (e) {
+        console.log("Tabla GrupoFamiliar no encontrada o error al consultar");
+      }
+      
+      return {
+        ...solicitud,
+        documentos,
+        grupoFamiliar,
+        miembrosFamilia: grupoFamiliar.length // Calculado dinámicamente
+      };
+    }));
+    
+    res.json(solicitudes);
+  } catch (err) {
+    console.error("Error al obtener solicitudes:", err);
+    res.status(500).json({ message: 'Error al obtener solicitudes' });
+  }
+});
+
+app.get('/api/solicitudes/estadisticas', async (req, res) => {
+  try {
+    const result = await sql.query(`
+      SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN estado = 'pendiente' THEN 1 ELSE 0 END) as pendientes,
+        SUM(CASE WHEN estado = 'en-revision' THEN 1 ELSE 0 END) as enRevision,
+        SUM(CASE WHEN estado = 'aprobada' THEN 1 ELSE 0 END) as aprobadas,
+        SUM(CASE WHEN estado = 'rechazada' THEN 1 ELSE 0 END) as rechazadas
+      FROM Solicitudes
+    `);
+    
+    res.json(result.recordset[0]);
+  } catch (err) {
+    console.error("Error al obtener estadísticas:", err);
+    res.status(500).json({ message: 'Error al obtener estadísticas' });
+  }
+});
+
+app.get('/api/solicitudes/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Consulta principal (existente)
+    const result = await sql.query`
+      SELECT 
+        s.idSolicitud, s.idEstudiante, s.estado, s.fechaSolicitud, s.fechaDecision, 
+        s.montoAprobado, s.motivoDecision,
+        d.nombre, d.PrimerApellido as apellido1, d.SegundoApellido as apellido2,
+        d.CedulaDimex as cedula, d.telefonoCelular as telefono,
+        d.correoElectronico as email, d.direccionExtra as direccion,
+        e.notaPromedio
+      FROM ProyectoRelampago.solicitudes s
+      JOIN ProyectoRelampago.datossolicitante d ON s.idEstudiante = d.idEstudiante
+      JOIN ProyectoRelampago.estudiantes e ON s.idEstudiante = e.idEstudiante
+      WHERE s.idSolicitud = ${parseInt(id)}
+    `;
+    
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ message: 'Solicitud no encontrada' });
+    }
+    
+    const solicitud = result.recordset[0];
+    
+    // Obtener información de la beca si la solicitud está aprobada
+    let becaInfo = null;
+    if (solicitud.estado === 'aprobada') {
+      const becaResult = await sql.query`
+        SELECT plazo, fechaAsignacion, fechaVencimiento 
+        FROM ProyectoRelampago.becas 
+        WHERE idEstudiante = ${solicitud.idEstudiante}
+        ORDER BY fechaAsignacion DESC
+      `;
+      becaInfo = becaResult.recordset[0] || null;
+    }
+    
+    // Resto del código existente (documentos, grupo familiar, etc.)
+    
+    res.json({
+      ...solicitud,
+      documentos: docs.recordset.map(d => d.nombreDocumento),
+      grupoFamiliar: familiares.recordset,
+      miembrosFamilia: familiares.recordset.length,
+      ingresoFamiliar: ingresoFamiliar,
+      beca: becaInfo // Agregamos la información de la beca
+    });
+    
+  } catch (err) {
+    console.error("Error al obtener solicitud:", err);
+    res.status(500).json({ message: 'Error al obtener solicitud' });
+  }
+});
+
+app.put('/api/solicitudes/:id/estado', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado, montoAprobado, motivoDecision } = req.body;
+    
+    await sql.query`
+      UPDATE Solicitudes 
+      SET 
+        estado = ${estado},
+        montoAprobado = ${montoAprobado},
+        motivoDecision = ${motivoDecision},
+        fechaDecision = GETDATE()
+      WHERE idSolicitud = ${id}
+    `;
+    
+    res.json({ message: 'Estado actualizado correctamente' });
+  } catch (err) {
+    console.error("Error al actualizar estado:", err);
+    res.status(500).json({ message: 'Error al actualizar estado' });
+  }
+});
+
+app.post('/api/becas', async (req, res) => {
+  try {
+    const { idEstudiante, monto, plazoMeses } = req.body;
+    
+    // Validar datos de entrada
+    if (!idEstudiante || !monto || !plazoMeses) {
+      return res.status(400).json({ message: 'Datos incompletos' });
+    }
+
+    // Calcular fecha de vencimiento
+    const fechaAsignacion = new Date();
+    const fechaVencimiento = new Date();
+    fechaVencimiento.setMonth(fechaVencimiento.getMonth() + parseInt(plazoMeses));
+    
+    await sql.query`
+      INSERT INTO ProyectoRelampago.becas 
+        (idEstudiante, monto, plazo, fechaAsignacion, fechaVencimiento, estado)
+      VALUES 
+        (${parseInt(idEstudiante)}, ${parseFloat(monto)}, ${parseInt(plazoMeses)}, 
+        ${fechaAsignacion.toISOString()}, ${fechaVencimiento.toISOString()}, 'activa')
+    `;
+    
+    res.json({ 
+      message: 'Beca creada exitosamente',
+      fechaVencimiento: fechaVencimiento.toISOString().split('T')[0]
+    });
+  } catch (err) {
+    console.error("Error al crear beca:", err);
+    res.status(500).json({ message: 'Error al crear beca' });
+  }
+});
+
+
+
+app.post('/getSolicitudes', async (req, res) => {
+  const { idEstudiante } = req.body;
+ 
+  try {
+    const result = await sql.query`
+      EXEC [ProyectoRelampago].[getEstadoSolicitudes] @idEstudiante=${idEstudiante}
+    `;
+ 
+    if (result.recordset && result.recordset.length > 0) {
+      res.status(200).json({
+        message: 'Solicitudes encontradas',
+        data: result.recordset,
+      });
+    } else {
+      res.status(404).json({
+        message: 'No se encontraron solicitudes para este estudiante.',
+      });
+    }
+  } catch (err) {
+    console.error('Error al ejecutar el procedimiento:', err);
+    res.status(500).json({
+      message: 'Hubo un error al obtener las solicitudes.',
+      error: err.message,
+    });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+ 
 // Manejo de errores simple
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Algo salió mal!');
 });
-
+ 
 // Iniciar el servidor
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Servidor corriendo en el puerto ${port}`);
 });
-
-// Crear una beca para un estudiante
-app.post('/api/becas', async (req, res) => {
-  try {
-    const { idEstudiante, monto, plazo } = req.body;
-   
-    if (!idEstudiante || !monto || !plazo) {
-      return res.status(400).json({ error: 'Todos los campos son requeridos' });
-    }
-   
-    // Verificar si el estudiante ya tiene una beca
-    const [existente] = await executeQuery(
-      'SELECT * FROM becas WHERE idEstudiante = ?',
-      [idEstudiante]
-    );
-   
-    if (existente) {
-      return res.status(400).json({ error: 'El estudiante ya tiene una beca asignada' });
-    }
-   
-    // Crear la beca
-    await executeQuery(
-      'INSERT INTO becas (idEstudiante, nombre, monto, plazo) VALUES (?, ?, ?, ?)',
-      [idEstudiante, 'Beca Socioeconómica', monto, plazo]
-    );
-   
-    // Actualizar estado del estudiante
-    await executeQuery(
-      'UPDATE estudiantes SET Beca = 1 WHERE idEstudiante = ?',
-      [idEstudiante]
-    );
-   
-    res.json({ message: 'Beca creada exitosamente' });
-  } catch (error) {
-    console.error('Error al crear beca:', error);
-    res.status(500).json({ error: 'Error al crear beca' });
-  }
-});
-
-module.exports = app;
-

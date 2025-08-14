@@ -3,15 +3,414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de Estudiantes</title>
-    <link href="css/login.css" rel="stylesheet">  <!-- Puedes incluir el archivo CSS si lo deseas -->
+    <title>Mi Solicitud de Beca - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --university-navy: #1e3a5f;
+            --university-gold: #d4af37;
+            --university-burgundy: #8b1538;
+            --university-cream: #faf8f5;
+            --university-sage: #6b7c5a;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .university-heading {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #e5e7eb 0%, #d1d5db 100%);
+            border-radius: 0.5rem;
+            height: 0.875rem;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, var(--university-gold) 0%, #b8941f 100%);
+            height: 100%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-button.active {
+            background: linear-gradient(135deg, var(--university-navy) 0%, #2c5282 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.25);
+            border-bottom: 3px solid var(--university-gold);
+        }
+        
+        .university-card {
+            background: linear-gradient(135deg, white 0%, var(--university-cream) 100%);
+            border: 1px solid rgba(30, 58, 95, 0.1);
+            box-shadow: 0 8px 25px rgba(30, 58, 95, 0.08);
+        }
+        
+        .university-header {
+            background: linear-gradient(135deg, var(--university-navy) 0%, #2c5282 100%);
+            box-shadow: 0 4px 20px rgba(30, 58, 95, 0.15);
+        }
+        
+        .status-badge {
+            background: linear-gradient(135deg, var(--university-gold) 0%, #b8941f 100%);
+            color: var(--university-navy);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+        }
+        
+        .success-badge {
+            background: linear-gradient(135deg, var(--university-sage) 0%, #5a6b47 100%);
+            color: white;
+        }
+        
+        .pending-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .university-button {
+            background: linear-gradient(135deg, var(--university-navy) 0%, #2c5282 100%);
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.2);
+        }
+        
+        .university-button:hover {
+            background: linear-gradient(135deg, #2c5282 0%, var(--university-navy) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(30, 58, 95, 0.3);
+        }
+        
+        .university-button-secondary {
+            background: linear-gradient(135deg, white 0%, var(--university-cream) 100%);
+            border: 2px solid var(--university-navy);
+            color: var(--university-navy);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .university-button-secondary:hover {
+            background: linear-gradient(135deg, var(--university-navy) 0%, #2c5282 100%);
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .document-card-uploaded {
+            background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+            border: 2px solid var(--university-sage);
+            box-shadow: 0 4px 12px rgba(107, 124, 90, 0.1);
+        }
+        
+        .document-card-pending {
+            background: linear-gradient(135deg, #fef7e0 0%, #fef3c7 100%);
+            border: 2px solid #f59e0b;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+        }
+        
+        .alert-box {
+            background: linear-gradient(135deg, #fef7e0 0%, #fef3c7 100%);
+            border: 2px solid var(--university-gold);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center min-h-screen p-4">
+<body class="min-h-screen" style="background: linear-gradient(135deg, #f8fafc 0%, var(--university-cream) 100%);">
+    <!-- Header -->
+    <header class="university-header text-white border-b-4 border-yellow-400">
+        <div class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i data-lucide="graduation-cap" class="h-10 w-10 text-yellow-300"></i>
+                    <div>
+                        <h1 class="text-3xl font-bold university-heading text-white">Mi Solicitud de Beca</h1>
+                        <p class="text-blue-100 font-medium">Bienvenido, <span id="userName" class="text-yellow-300 font-semibold">Juan Pérez</span></p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="inline-flex items-center px-4 py-3 university-button-secondary text-sm font-semibold rounded-lg transition-all duration-300">
+                    <i data-lucide="log-out" class="h-4 w-4 mr-2"></i>
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </header>
 
-    <div class="text-center">
-        <h1 class="text-4xl font-bold text-gray-900">Página de Estudiantes</h1>
-        <p class="text-lg text-gray-600 mt-4">Bienvenido al portal de estudiantes del sistema de becas.</p>
+    <div class="container mx-auto px-6 py-10">
+        <!-- Status Overview -->
+        <div class="university-card shadow-xl rounded-xl mb-10">
+            <div class="px-8 py-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold university-heading text-gray-800">Estado de tu Solicitud</h3>
+                    <span class="status-badge inline-flex items-center px-4 py-2 rounded-full text-sm font-bold">
+                        <i data-lucide="clock" class="h-4 w-4 mr-2"></i>
+                        En Proceso
+                    </span>
+                </div>
+                <p class="mt-2 text-gray-600 font-medium">
+                    Solicitud #APP001 • Iniciada el 15/01/2024
+                </p>
+            </div>
+            <div class="px-8 py-6">
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between text-sm font-semibold mb-3 text-gray-700">
+                            <span>Progreso de Documentación</span>
+                            <span id="progressText">12 de 17 documentos</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 71%"></div>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2 font-medium"><span id="progressPercentage" class="text-yellow-600 font-bold">71</span>% completado</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
+                            <i data-lucide="check-circle" class="h-6 w-6 text-green-700"></i>
+                            <span class="font-semibold text-green-800">Formulario Completado</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <i data-lucide="alert-circle" class="h-6 w-6 text-yellow-700"></i>
+                            <span class="font-semibold text-yellow-800">Documentos Pendientes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="space-y-8">
+            <div class="border-b-2 border-gray-200">
+                <nav class="-mb-px flex space-x-1">
+                    <button onclick="switchTab('documents')" class="tab-button active py-4 px-6 font-bold text-sm rounded-t-lg transition-all duration-300">
+                        Documentos Requeridos
+                    </button>
+                    <button onclick="switchTab('form')" class="tab-button py-4 px-6 font-semibold text-sm text-gray-600 hover:text-gray-800 rounded-t-lg transition-all duration-300 hover:bg-gray-50">
+                        Formulario de Solicitud
+                    </button>
+                    <button onclick="switchTab('profile')" class="tab-button py-4 px-6 font-semibold text-sm text-gray-600 hover:text-gray-800 rounded-t-lg transition-all duration-300 hover:bg-gray-50">
+                        Mi Información
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Documents Tab -->
+            <div id="documents" class="tab-content active space-y-8">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold university-heading text-gray-800">Documentos Requeridos (Anexos)</h2>
+                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-800 border-2 border-gray-300">
+                        12/17 subidos
+                    </span>
+                </div>
+
+                <div class="grid gap-6" id="documentsGrid">
+                    <!-- Documents will be populated by JavaScript -->
+                </div>
+
+                <div class="alert-box border rounded-xl p-6">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="alert-circle" class="h-6 w-6 text-yellow-700"></i>
+                        <p class="text-sm font-semibold text-yellow-800">
+                            <strong>Importante:</strong> Debes subir todos los documentos requeridos para que tu solicitud pueda ser procesada.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Tab -->
+            <div id="form" class="tab-content">
+                <div class="university-card shadow-xl rounded-xl">
+                    <div class="px-8 py-6 border-b border-gray-200">
+                        <h3 class="text-2xl font-bold university-heading text-gray-800">Formulario de Solicitud de Beca</h3>
+                        <p class="mt-2 text-gray-600 font-medium">Tu formulario ha sido completado y enviado</p>
+                    </div>
+                    <div class="px-8 py-12">
+                        <div class="text-center">
+                            <i data-lucide="file-text" class="h-20 w-20 mx-auto mb-6" style="color: var(--university-navy);"></i>
+                            <i data-lucide="check-circle" class="h-10 w-10 mx-auto mb-4" style="color: var(--university-sage);"></i>
+                            <h3 class="text-xl font-bold university-heading mb-3 text-gray-800">Formulario Completado</h3>
+                            <p class="text-gray-600 mb-8 font-medium">Tu formulario fue enviado el 15/01/2024</p>
+                            <div class="flex gap-4 justify-center">
+                                <a href="registro.html" class="university-button-secondary inline-flex items-center px-6 py-3 text-sm font-semibold rounded-lg">
+                                    Ver Formulario
+                                </a>
+                                <button class="university-button inline-flex items-center px-6 py-3 text-sm font-semibold rounded-lg text-white">
+                                    Editar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profile" class="tab-content">
+                <div class="university-card shadow-xl rounded-xl">
+                    <div class="px-8 py-6 border-b border-gray-200">
+                        <h3 class="text-2xl font-bold university-heading text-gray-800 flex items-center gap-3">
+                            <i data-lucide="user" class="h-6 w-6" style="color: var(--university-navy);"></i>
+                            Mi Información Personal
+                        </h3>
+                    </div>
+                    <div class="px-8 py-6 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <label class="text-sm font-bold text-gray-700 block mb-1">Nombre Completo</label>
+                                <p class="text-gray-900 font-semibold">Juan Pérez González</p>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <label class="text-sm font-bold text-gray-700 block mb-1">Correo Electrónico</label>
+                                <p class="text-gray-900 font-semibold">juan.perez@estudiante.cuc.cr</p>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <label class="text-sm font-bold text-gray-700 block mb-1">Número de Cédula</label>
+                                <p class="text-gray-900 font-semibold">1-1234-5678</p>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <label class="text-sm font-bold text-gray-700 block mb-1">Carnet Estudiantil</label>
+                                <p class="text-gray-900 font-semibold">2024123456</p>
+                            </div>
+                        </div>
+                        <div class="pt-4">
+                            <button class="university-button inline-flex items-center px-6 py-3 text-sm font-semibold rounded-lg text-white">
+                                Actualizar Información
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <script>
+        // Mock data
+        const requiredDocuments = [
+            { id: 1, name: "Fotocopia de Cédula de Identidad", uploaded: true },
+            { id: 2, name: "Orden Patronal y Constancia de Salario", uploaded: true },
+            { id: 3, name: "Constancia de Actividades Agropecuarias", uploaded: false },
+            { id: 4, name: "Informe de Adecuación Curricular", uploaded: false },
+            { id: 5, name: "Cartas de Despido o Renuncia", uploaded: true },
+            { id: 6, name: "Constancia de NO COTIZANTE CCSS", uploaded: true },
+            { id: 7, name: "Certificación de Pensión", uploaded: false },
+            { id: 8, name: "Constancia de Viudez u Orfandad", uploaded: false },
+            { id: 9, name: "Constancia de Separación/Pensión", uploaded: true },
+            { id: 10, name: "Constancia de Beca de Hermanos", uploaded: true },
+            { id: 11, name: "Recibo de Impuesto Territorial", uploaded: true },
+            { id: 12, name: "Certificación de Bienes Inmuebles", uploaded: true },
+            { id: 13, name: "Recibo de Marchamo de Vehículo", uploaded: false },
+            { id: 14, name: "Contrato de Arrendamiento", uploaded: true },
+            { id: 15, name: "Constancia Médica", uploaded: true },
+            { id: 16, name: "Certificación Grupo Étnico Indígena", uploaded: false },
+            { id: 17, name: "Comprobante de Pago del Formulario", uploaded: true },
+        ];
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab button
+            event.target.classList.add('active');
+        }
+
+        // File upload functionality
+        function handleFileUpload(documentId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.pdf,.jpg,.jpeg,.png,.doc,.docx';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    console.log(`Uploading file for document ${documentId}:`, file.name);
+                    // Here you would typically upload the file to your server
+                    alert(`Archivo "${file.name}" seleccionado para el documento ${documentId}`);
+                }
+            };
+            input.click();
+        }
+
+        // Logout functionality
+        function logout() {
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                // Here you would typically clear session data and redirect
+                alert('Cerrando sesión...');
+                 window.location.href = '/index.html';
+            }
+        }
+
+        // Populate documents grid
+        function populateDocuments() {
+            const grid = document.getElementById('documentsGrid');
+            grid.innerHTML = '';
+
+            requiredDocuments.forEach(doc => {
+                const docCard = document.createElement('div');
+                docCard.className = `${doc.uploaded ? 'document-card-uploaded' : 'document-card-pending'} rounded-xl transition-all duration-300 hover:transform hover:scale-[1.02]`;
+                
+                docCard.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <i data-lucide="${doc.uploaded ? 'check-circle' : 'alert-circle'}" 
+                                   class="h-6 w-6 ${doc.uploaded ? 'text-green-700' : 'text-yellow-700'}"></i>
+                                <div>
+                                    <p class="font-bold text-gray-800">Anexo #${doc.id}</p>
+                                    <p class="text-sm text-gray-600 font-medium">${doc.name}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="success-badge pending-badge inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+                                    doc.uploaded 
+                                        ? 'success-badge' 
+                                        : 'pending-badge'
+                                }">
+                                    ${doc.uploaded ? 'Subido' : 'Pendiente'}
+                                </span>
+                                <button onclick="handleFileUpload(${doc.id})" 
+                                        class="inline-flex items-center px-4 py-2 ${
+                                            doc.uploaded 
+                                                ? 'university-button-secondary' 
+                                                : 'university-button text-white'
+                                        } text-sm font-semibold rounded-lg transition-all duration-300">
+                                    <i data-lucide="upload" class="h-4 w-4 mr-2"></i>
+                                    ${doc.uploaded ? 'Reemplazar' : 'Subir'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(docCard);
+            });
+
+            // Re-initialize Lucide icons for the new content
+            lucide.createIcons();
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            populateDocuments();
+        });
+    </script>
 </body>
 </html>

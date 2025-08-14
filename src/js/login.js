@@ -41,7 +41,7 @@ loginForm.addEventListener('submit', async (e) => {
             if (data.message.includes('Estudiante')) {
                 window.location.href = 'estudiante.html';  // Redirigir a estudiante.html
             } else if (data.message.includes('Administrador')) {
-                window.location.href = 'administrador.html';  // Redirigir a administrador.html
+                window.location.href = 'dashboard_admin.html';  // Redirigir a administrador.html
             } else if (data.message.includes('Aprobador')) {
                 window.location.href = 'aprobador.html';  // Redirigir a aprobador.html
             } else {

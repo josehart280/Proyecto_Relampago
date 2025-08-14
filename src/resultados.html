@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padrón de Resultados de Becas</title>
+    <link href="css/resultados.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100">
+<!--Un comentario-->
+<div class="container mx-auto px-4 py-8">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Padrón de Resultados de Becas</h1>
+        <p class="text-gray-600">Consulta el estado de tu solicitud de beca ingresando tu número de cédula</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+        <div class="text-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-900">Consultar Resultado</h2>
+            <p class="text-gray-600">Ingresa tu número de cédula para consultar el estado de tu solicitud</p>
+        </div>
+
+        <form id="searchForm" class="space-y-4">
+            <div class="space-y-2">
+                <label for="cedula" class="block text-gray-700 font-medium">Número de Cédula</label>
+                <input type="text" id="cedula" class="w-full p-2 border border-gray-300 rounded-md" required placeholder="Número de cédula (ej: 123456789)">
+            </div>
+            <button type="submit" id="submitButton" class="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700">Consultar</button>
+        </form>
+    </div>
+
+    <div id="resultSection" class="hidden">
+        <div id="resultCard" class="bg-white p-6 rounded-lg shadow-lg"></div>
+    </div>
+
+    <div class="mt-8 text-center">
+        <button onclick="window.location.href='index.html'" class="w-full bg-gray-600 text-white py-2 rounded-md hover:bg-gray-700">Volver al Inicio</button>
+    </div>
+</div>
+
+<script>
+document.getElementById("searchForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const cedula = document.getElementById("cedula").value.trim();
+    const idEstudiante = parseInt(cedula);
+
+    if (isNaN(idEstudiante)) {
+        Swal.fire('Error', 'La cédula debe ser un número válido', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/getSolicitudes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idEstudiante })
+        });
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                Swal.fire('Sin resultados', 'No se encontró ninguna solicitud para esta cédula', 'info');
+            } else {
+                throw new Error('Error al obtener los resultados');
+            }
+            return;
+        }
+
+        const resultados = await response.json();
+        const resultSection = document.getElementById("resultSection");
+        const resultCard = document.getElementById("resultCard");
+
+        if (!resultados.data || resultados.data.length === 0) {
+            resultSection.classList.add("hidden");
+            Swal.fire('Sin resultados', 'No se encontró ninguna solicitud para esta cédula', 'info');
+            return;
+        }
+
+        resultSection.classList.remove("hidden");
+        let html = '';
+
+        resultados.data.forEach(r => {
+            // Buscar la propiedad que contenga "estado" (robusto aunque el nombre cambie)
+            let estado = 'No definido';
+            for (const key in r) {
+                if (key.toLowerCase().includes('estado')) {
+                    estado = r[key] || 'No definido';
+                    break;
+                }
+            }
+
+            // Definir clase de badge
+            let badgeClass = 'bg-gray-100 text-gray-700';
+            if (['aprobada','aceptada','aprobado','aceptó','aceptado'].includes(estado.toLowerCase())) {
+                badgeClass = 'bg-green-100 text-green-600';
+            } else if (['rechazada','rechazado','denegada','denegado'].includes(estado.toLowerCase())) {
+                badgeClass = 'bg-red-100 text-red-600';
+            }
+
+            html += `
+                <div class="text-center mb-4">
+                    <h3 class="text-xl font-semibold mb-2">${r.nombreEstudiante || 'Estudiante'}</h3>
+                    <span class="inline-block px-4 py-2 rounded-full text-sm ${badgeClass}">
+                        ${estado}
+                    </span>
+                </div>
+            `;
+
+            if (r.montoAprobado) {
+                html += `
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex justify-between">
+                            <span class="font-semibold">Monto Aprobado:</span>
+                            <span>₡${parseFloat(r.montoAprobado).toLocaleString()}</span>
+                        </div>
+                        <div class="flex justify-between mt-2">
+                            <span class="font-semibold">Fecha de decisión:</span>
+                            <span>${r.fechaDecision ? new Date(r.fechaDecision).toLocaleDateString('es-CR') : 'No disponible'}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (r.motivoDecision) {
+                html += `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mt-2">
+                        <h4 class="font-semibold text-red-800 mb-2">Motivo:</h4>
+                        <p class="text-red-700">${r.motivoDecision}</p>
+                    </div>
+                `;
+            }
+        });
+
+        resultCard.innerHTML = html;
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire('Error', 'Ocurrió un error al consultar el estado de la solicitud', 'error');
+    }
+});
+</script>
+</body>
+</html>

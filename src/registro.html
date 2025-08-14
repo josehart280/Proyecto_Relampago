@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Solicitud de Beca - CUC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- Added Google Fonts for elegant typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Updated to elegant university color scheme and typography */
+        :root {
+            --university-navy: #1e3a5f;
+            --university-gold: #d4af37;
+            --university-sage: #6b7c5a;
+            --university-cream: #faf8f5;
+            --university-light-gold: #f4e8c1;
+            --university-dark-navy: #152a42;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--university-cream) 0%, #f8f6f0 100%);
+        }
+        
+        .university-title {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .progress-bar {
+            transition: width 0.3s ease;
+            background: linear-gradient(90deg, var(--university-gold) 0%, #e6c547 100%);
+        }
+        
+        .step-content {
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .official-header {
+            background: linear-gradient(135deg, var(--university-navy) 0%, var(--university-dark-navy) 100%);
+            box-shadow: 0 8px 32px rgba(30, 58, 95, 0.3);
+        }
+        
+        .form-section {
+            border-left: 4px solid var(--university-gold);
+            padding-left: 1.5rem;
+            background: linear-gradient(90deg, var(--university-light-gold) 0%, transparent 100%);
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .elegant-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(30, 58, 95, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+        
+        .elegant-input {
+            border: none;
+            border-bottom: 2px solid #e5e7eb;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .elegant-input:focus {
+            border-bottom-color: var(--university-gold);
+            background: var(--university-cream);
+            outline: none;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
+        }
+        
+        .elegant-button {
+            background: linear-gradient(135deg, var(--university-navy) 0%, var(--university-dark-navy) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(30, 58, 95, 0.2);
+        }
+        
+        .elegant-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(30, 58, 95, 0.3);
+        }
+        
+        .elegant-button-secondary {
+            background: white;
+            color: var(--university-navy);
+            border: 2px solid var(--university-navy);
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .elegant-button-secondary:hover {
+            background: var(--university-navy);
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .elegant-button-gold {
+            background: linear-gradient(135deg, var(--university-gold) 0%, #e6c547 100%);
+            color: var(--university-navy);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+        }
+        
+        .elegant-button-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+        }
+        
+        .elegant-table {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(30, 58, 95, 0.1);
+        }
+        
+        .elegant-table th {
+            background: linear-gradient(135deg, var(--university-navy) 0%, var(--university-dark-navy) 100%);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .elegant-table tbody tr:nth-child(even) {
+            background: var(--university-cream);
+        }
+        
+        .elegant-table tbody tr:hover {
+            background: var(--university-light-gold);
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, var(--university-light-gold) 0%, #f7f0d4 100%);
+            border: 1px solid var(--university-gold);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.1);
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #fef3cd 0%, #fde68a 100%);
+            border: 1px solid #f59e0b;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.1);
+        }
+        
+        .success-box {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 1px solid var(--university-sage);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(107, 124, 90, 0.1);
+        }
+        
+        .signature-section {
+            background: linear-gradient(135deg, var(--university-cream) 0%, #f5f2e8 100%);
+            border: 2px solid var(--university-gold);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Official Header -->
+    <header class="official-header text-white">
+        <div class="container mx-auto px-6 py-8">
+            <div class="text-center">
+                <!-- Applied elegant typography and improved spacing -->
+                <h1 class="university-title text-3xl font-bold mb-3 text-yellow-100">COLEGIO UNIVERSITARIO DE CARTAGO</h1>
+                <h2 class="text-xl font-semibold mb-2 text-blue-100">BIENESTAR ESTUDIANTIL Y CALIDAD DE VIDA</h2>
+                <h3 class="text-lg font-medium mb-6 text-blue-200">TRABAJO SOCIAL</h3>
+                <h4 class="university-title text-2xl font-bold text-yellow-200">FORMULARIO DE SOLICITUD DE BECA</h4>
+                <p class="text-base mt-3 text-blue-100">RESUMEN SITUACIÓN SOCIO-ECONÓMICA</p>
+            </div>
+            <div class="flex items-center justify-between mt-6">
+                <!-- Updated button styling to elegant design -->
+                <a href="estudiante.html" class="elegant-button-secondary inline-flex items-center">
+                    <i data-lucide="arrow-left" class="h-4 w-4 mr-2"></i>
+                    Volver al Dashboard
+                </a>
+                <div class="text-right">
+                    <p class="text-blue-100">Formulario N° <span class="border-b-2 border-yellow-300 px-3 py-1 text-yellow-200">_______</span></p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Important Information -->
+    <div class="container mx-auto px-6 py-8">
+        <!-- Applied elegant card styling and improved typography -->
+        <div class="info-box p-8 mb-8">
+            <h3 class="university-title font-bold text-2xl mb-6" style="color: var(--university-navy);">CONSIDERACIONES IMPORTANTES ACERCA DEL TRÁMITE DE SOLICITUD DE BECA:</h3>
+            <div class="text-sm space-y-4" style="color: var(--university-dark-navy);">
+                <p class="leading-relaxed">El fin de este formulario de solicitud de beca es para obtener información requerida por parte del Colegio Universitario de Cartago (CUC) con una visión, lo más completa posible, sobre la situación socioeconómica (condiciones personales, académicas, económicas, familiares) del estudiante interesado en obtener el beneficio de beca de nuestra Institución.</p>
+                
+                <p class="leading-relaxed">El estudiante está en la obligación de contestar todas las preguntas en forma clara, completa y veraz, deberá aportar toda la documentación que se le solicita, además debe indicar cualquier otro dato que considere necesario para valorar su situación.</p>
+                
+                <p class="leading-relaxed">La información suministrada es confidencial y por lo tanto es de uso exclusivo de la Oficina de Trabajo Social para los propósitos que la Institución se ha propuesto. Toda información facilitada en el formulario podrá ser verificada por parte del CUC, a través de visitas domiciliarias, entrevistas, coordinación interinstitucional e información de la comunidad o cualquier otro medio pertinente.</p>
+                
+                <p class="leading-relaxed"><strong>Es deber de todo solicitante conocer el Reglamento de Becas, el cual se encuentra disponible en la página web www.cuc.ac.cr.</strong></p>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <!-- Enhanced progress bar with elegant styling -->
+        <div class="mb-10">
+            <div class="flex justify-between text-sm font-semibold mb-4" style="color: var(--university-navy);">
+                <span id="step-info">Paso 1 de 5: Datos de Identificación</span>
+                <span id="progress-percent">20% Completado</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3 shadow-inner">
+                <div id="progress-bar" class="progress-bar h-3 rounded-full" style="width: 20%"></div>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <!-- Applied elegant card styling -->
+        <div class="elegant-card p-8">
+            <!-- Step 0: Datos de Identificación -->
+            <div id="step-0" class="step-content active">
+                <div class="form-section">
+                    <!-- Updated section title styling -->
+                    <h3 class="university-title text-xl font-bold mb-8" style="color: var(--university-navy);">I. DATOS (IDENTIFICACIÓN – ACADÉMICA) DE EL/LA ESTUDIANTE SOLICITANTE</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Nombre</label>
+                            <!-- Applied elegant input styling -->
+                            <input type="text" id="nombre" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Primer Apellido</label>
+                            <input type="text" id="primerApellido" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Segundo Apellido</label>
+                            <input type="text" id="segundoApellido" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Número de Cédula o DIMEX</label>
+                            <input type="text" id="cedula" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Nacionalidad</label>
+                            <input type="text" id="nacionalidad" value="Costarricense" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Carnet</label>
+                            <input type="text" id="carnet" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Sexo</label>
+                            <div class="flex space-x-6 mt-3">
+                                <label class="flex items-center">
+                                    <input type="radio" name="sexo" value="M" class="mr-3">
+                                    <span class="text-sm" style="color: var(--university-navy);">M</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="sexo" value="F" class="mr-3">
+                                    <span class="text-sm" style="color: var(--university-navy);">F</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Edad</label>
+                            <input type="number" id="edad" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Día</label>
+                            <input type="number" id="dia" min="1" max="31" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Mes</label>
+                            <input type="number" id="mes" min="1" max="12" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Año</label>
+                            <input type="number" id="ano" min="1900" max="2010" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Correo Electrónico</label>
+                            <input type="email" id="correo" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Teléfono Celular</label>
+                            <input type="tel" id="telefonoCelular" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Teléfono Domiciliar</label>
+                            <input type="tel" id="telefonoDomiciliar" class="elegant-input w-full px-4 py-3">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Estado Civil</label>
+                            <input type="text" id="estadoCivil" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Carrera</label>
+                            <input type="text" id="carrera" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Nivel (Cuatrimestre cursa)</label>
+                            <input type="text" id="nivel" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Provincia</label>
+                            <input type="text" id="provincia" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Cantón</label>
+                            <input type="text" id="canton" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Distrito</label>
+                            <input type="text" id="distrito" class="elegant-input w-full px-4 py-3" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Dirección Exacta (IMPORTANTE: anote N° casa, color, una descripción de algo cerca):</label>
+                        <textarea id="direccionExacta" rows="3" class="elegant-input w-full px-4 py-3 rounded-md" required></textarea>
+                    </div>
+
+                    <div class="mb-8">
+                        <label class="block text-sm font-semibold mb-3" style="color: var(--university-navy);">Su condición como solicitante es:</label>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="condicionSolicitante" value="regular" class="mr-3">
+                                <span class="text-sm" style="color: var(--university-navy);">Estudiante Regular, matriculado actualmente en el CUC</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="condicionSolicitante" value="primera-vez" class="mr-3">
+                                <span class="text-sm" style="color: var(--university-navy);">Estudiante Regular, matriculado actualmente en el CUC que solicita beca por 1 vez</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="condicionSolicitante" value="primer-ingreso" class="mr-3">
+                                <span class="text-sm" style="color: var(--university-navy);">Estudiante Primer Ingreso, no ha ingresado al CUC</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Updated information box styling -->
+                    <div class="warning-box p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                            <div>
+                                <p class="font-bold text-amber-800 mb-2">Fecha Entrega:</p>
+                                <p class="text-amber-700">Martes 5 junio, 2018</p>
+                                <p class="text-amber-700">10:00am a 3:00pm Únicamente</p>
+                                <p class="text-amber-700">Aula: Empresarial</p>
+                            </div>
+                            <div>
+                                <p class="font-bold text-amber-800 mb-2">Consultas al teléfono:</p>
+                                <p class="text-amber-700 text-lg font-semibold">2550-6231</p>
+                            </div>
+                            <div>
+                                <p class="text-amber-700 text-xs leading-relaxed">En CUC Virtual se publicará la fecha de la próxima reunión de asistencia obligatoria</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 1: Grupo Familiar -->
+            <div id="step-1" class="step-content">
+                <div class="form-section">
+                    <h3 class="university-title text-xl font-bold mb-8" style="color: var(--university-navy);">II. DATOS DEL GRUPO FAMILIAR - SITUACIÓN ECONÓMICA - SALUD DE EL/LA ESTUDIANTE SOLICITANTE</h3>
+                    
+                    <!-- Updated information box styling -->
+                    <div class="info-box p-6 mb-8">
+                        <p class="text-sm mb-4 leading-relaxed" style="color: var(--university-dark-navy);">
+                            Llene el siguiente cuadro con los datos de cada uno de los miembros del grupo familiar (número total de miembros que viven con el/la estudiante solicitante en su hogar). Debe iniciar con los datos de el/la estudiante solicitante. <strong>DEBE ANOTAR A TODOS.</strong>
+                        </p>
+                        <div class="text-xs space-y-2" style="color: var(--university-navy);">
+                            <p><strong>Parentesco:</strong> se refiere al grado de consanguineidad o afinidad con el/la estudiante solicitante a la beca. Ej: solicitante, madre, padre, hermano(a), primo, tío(a), sobrino(a), entre otros.</p>
+                            <p><strong>Salud:</strong> Es importante saber si es un diagnóstico de salud, mental, física, Enfermedad Crónica, Invalidez Física, Alcoholismo, Uso de Drogas, Mala Nutrición u otro(s)</p>
+                            <p><strong>Ingresos mensuales:</strong> monto total que recibe cada miembro de la familia por concepto de ingresos por cuenta propia, salarios, beca, pensiones, alquileres, entre otros. Salario sin deducciones bruto.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="font-semibold text-lg" style="color: var(--university-navy);">Miembros del Grupo Familiar</h4>
+                        <!-- Applied elegant button styling -->
+                        <button onclick="addFamilyMember()" class="elegant-button inline-flex items-center">
+                            <i data-lucide="plus" class="h-4 w-4 mr-2"></i>
+                            Agregar Miembro
+                        </button>
+                    </div>
+
+                    <!-- Family Members Table -->
+                    <!-- Applied elegant table styling -->
+                    <div class="overflow-x-auto mb-8">
+                        <table class="elegant-table min-w-full">
+                            <thead>
+                                <tr class="text-xs">
+                                    <th class="px-3 py-4">Cédula</th>
+                                    <th class="px-3 py-4">Nombre</th>
+                                    <th class="px-3 py-4">Apellido 1</th>
+                                    <th class="px-3 py-4">Apellido 2</th>
+                                    <th class="px-3 py-4">Edad</th>
+                                    <th class="px-3 py-4">Parentesco</th>
+                                    <th class="px-3 py-4">Estado Civil</th>
+                                    <th class="px-3 py-4">Estudia</th>
+                                    <th class="px-3 py-4">BECA</th>
+                                    <th class="px-3 py-4">Salud</th>
+                                    <th class="px-3 py-4">Ocupación</th>
+                                    <th class="px-3 py-4">Institución</th>
+                                    <th class="px-3 py-4">Ingreso Mensual Bruto (₡)</th>
+                                    <th class="px-3 py-4">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="family-members-table">
+                                <!-- Family members will be added dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Otros Ingresos -->
+                    <div class="mt-10">
+                        <h4 class="font-bold text-lg mb-6" style="color: var(--university-navy);">OTROS INGRESOS DEL GRUPO FAMILIAR</h4>
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Ayuda económica de familiares (que no vivan en la casa), de particulares u otras ayudas (Fundaciones, grupos religiosos, organizaciones comunales entre otros)</label>
+                                <div class="flex items-center">
+                                    <span class="mr-2" style="color: var(--university-navy);">₡</span>
+                                    <input type="number" id="ayudaEconomica" placeholder="0" class="elegant-input w-full px-4 py-3">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Ingresos (lo que en el hogar se recibe) por concepto de alquileres de locales, casas, cocheras, lotes, vehículos, entre otros.</label>
+                                <div class="flex items-center">
+                                    <span class="mr-2" style="color: var(--university-navy);">₡</span>
+                                    <input type="number" id="ingresosAlquileres" placeholder="0" class="elegant-input w-full px-4 py-3">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2" style="color: var(--university-navy);">Otras ayudas que ingresan mensual al hogar y que se reciben en especie, indique un monto aproximado</label>
+                                <div class="flex items-center">
+                                    <span class="mr-2" style="color: var(--university-navy);">₡</span>
+                                    <input type="number" id="otrasAyudas" placeholder="0" class="elegant-input w-full px-4 py-3">
+                                </div>
+                            </div>
+                            <div class="info-box p-6 rounded">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-lg" style="color: var(--university-navy);">Total de Ingresos del Grupo familiar</span>
+                                    <span class="font-bold text-lg" style="color: var(--university-navy);">₡ <span id="totalIngresos">0</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Updated warning box styling -->
+                    <div class="warning-box p-6 mt-8">
+                        <p class="text-sm text-amber-800 leading-relaxed">
+                            <strong>Es muy importante conocer si el solicitante ha tenido o tiene en su contexto familiar situaciones:</strong> 
+                            Orfandad, Separación padres, Divorcio, Maltrato Físico/Verbal, ideación o suicidios, Falta de apoyo, Alcoholismo, Drogadicción, Malas Relaciones u Otro(s) puede exponerlo en una carta o de forma presencial en Trabajo Social.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Bienes y Propiedades -->
+            <div id="step-2" class="step-content">
+                <div class="form-section">
+                    <h3 class="text-lg font-bold mb-6">III. DATOS BIENES MUEBLES E INMUEBLES DEL GRUPO FAMILIAR</h3>
+
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold">PROPIEDADES DE LA FAMILIA</h4>
+                        <button onclick="addProperty()" class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
+                            <i data-lucide="plus" class="h-4 w-4 mr-2"></i>
+                            Agregar Propiedad
+                        </button>
+                    </div>
+
+                    <!-- Properties Table -->
+                    <div class="overflow-x-auto mb-6">
+                        <table class="min-w-full border border-gray-300">
+                            <thead class="bg-gray-50">
+                                <tr class="text-xs">
+                                    <th class="border border-gray-300 px-2 py-2">Nombre Propietario</th>
+                                    <th class="border border-gray-300 px-2 py-2">Número Cédula</th>
+                                    <th class="border border-gray-300 px-2 py-2 text-center">Lotes<br><small>Cuántos | Usos | Extensión y Ubicación</small></th>
+                                    <th class="border border-gray-300 px-2 py-2 text-center">Fincas/Parcelas<br><small>Cuántos | Usos | Extensión y Ubicación</small></th>
+                                    <th class="border border-gray-300 px-2 py-2 text-center">Casas de habitación<br><small>Cuántos</small></th>
+                                    <th class="border border-gray-300 px-2 py-2 text-center">Casas de Alquiler<br><small>Cuántos</small></th>
+                                    <th class="border border-gray-300 px-2 py-2 text-center">Apartamentos<br><small>Cuántos</small></th>
+                                    <th class="border border-gray-300 px-2 py-2 text-center">Vehículos Motos u otros bienes muebles<br><small>Cuántos y Cuáles</small></th>
+                                    <th class="border border-gray-300 px-2 py-2">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="properties-table">
+                                <!-- Properties will be added dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-8">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Condición general de la vivienda que habita el estudiante con su familia:</label>
+                        <textarea id="condicionVivienda" rows="4" placeholder="Describa las condiciones generales de la vivienda donde habita el estudiante con su familia..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Documentos Anexos -->
+            <div id="step-3" class="step-content">
+                <div class="form-section">
+                    <h3 class="text-lg font-bold mb-6">DOCUMENTOS ANEXOS REQUERIDOS</h3>
+                    
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                        <p class="text-sm text-red-800 font-bold mb-2">
+                            Esta solicitud obligatoriamente debe entregarse acompañada de los siguientes documentos EN ÉSE MISMO ORDEN DEBEN DE ANEXARSE:
+                        </p>
+                        <div class="text-xs text-red-700 space-y-1">
+                            <p>• Toda constancia o certificación debe presentarse firmada y sellada por la entidad emisora, que no tenga una fecha de emisión de más de tres meses.</p>
+                            <p>• <strong>No procederá ningún tipo de apelación por falta de documentos, sin excepción.</strong></p>
+                            <p>• <strong>Ante la ausencia de datos o requisitos no procede el estudio</strong></p>
+                        </div>
+                    </div>
+
+                    <div id="attachments" class="space-y-4">
+                        <!-- Attachments will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Revisión y Envío -->
+            <div id="step-4" class="step-content">
+                <div class="form-section">
+                    <h3 class="university-title text-xl font-bold mb-8" style="color: var(--university-navy);">REVISIÓN Y DECLARACIÓN JURADA</h3>
+
+                    <!-- Updated declaration box styling -->
+                    <div class="info-box p-8 mb-8">
+                        <p class="text-sm mb-4 leading-relaxed" style="color: var(--university-dark-navy);">
+                            <strong>Debidamente apercibido de las implicaciones legales que implica el delito de perjuicio establecido en el código penal, declaro bajo gravedad de juramento, que los datos e informes que brindo son fidedignos. A su vez me comprometo con las disposiciones establecidas en el Reglamento de Becas de la Institución.</strong>
+                        </p>
+                        <p class="text-sm mb-4 leading-relaxed" style="color: var(--university-dark-navy);">
+                            Cualquier dato falso u omisión de información, anula la presente solicitud, perdiendo el estudiante, la oportunidad de gozar de este beneficio, toda solicitud presentada fuera de la fecha indicada o sin la documentación requerida y actualizada, es nula y por tanto se desechará de oficio.
+                        </p>
+                        <p class="text-sm leading-relaxed" style="color: var(--university-dark-navy);">
+                            Toda situación que afecte los requisitos que el Reglamento de Becas establece deberá informar de forma escrita en el Departamento de Bienestar Estudiantil y Calidad de Vida.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                        <div class="elegant-card p-6">
+                            <h4 class="font-semibold text-lg mb-4" style="color: var(--university-navy);">Resumen de Datos Personales</h4>
+                            <div id="personal-summary" class="space-y-3 text-sm" style="color: var(--university-dark-navy);">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="elegant-card p-6">
+                            <h4 class="font-semibold text-lg mb-4" style="color: var(--university-navy);">Resumen del Grupo Familiar</h4>
+                            <div id="family-summary" class="space-y-3 text-sm" style="color: var(--university-dark-navy);">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Signature Section -->
+                    <!-- Applied elegant signature section styling -->
+                    <div class="signature-section p-8 mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div class="text-center">
+                                <div class="border-b-2 mb-3 pb-12" style="border-color: var(--university-gold);"></div>
+                                <p class="text-sm font-semibold" style="color: var(--university-navy);">Firma</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="border-b-2 mb-3 pb-12" style="border-color: var(--university-gold);"></div>
+                                <p class="text-sm font-semibold" style="color: var(--university-navy);">Cédula</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="border-b-2 mb-3 pb-12" style="border-color: var(--university-gold);"></div>
+                                <p class="text-sm font-semibold" style="color: var(--university-navy);">Fecha</p>
+                            </div>
+                        </div>
+                        <p class="text-center text-sm font-bold text-red-600 mt-6">
+                            ESTA SOLICITUD DE BECA ES NULA SIN LA FIRMA DEL ESTUDIANTE.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center space-x-3 mb-8">
+                        <input type="checkbox" id="terms" required class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="terms" class="text-sm font-semibold" style="color: var(--university-navy);">
+                            Acepto los términos y condiciones del Reglamento de Becas del CUC y declaro que toda la información proporcionada es veraz y completa.
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <!-- Updated navigation buttons with elegant styling -->
+            <div class="flex justify-between pt-8 border-t-2" style="border-color: var(--university-gold);">
+                <button id="prev-btn" onclick="prevStep()" class="elegant-button-secondary disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Anterior
+                </button>
+
+                <div class="flex gap-3">
+                    <button onclick="saveDraft()" class="elegant-button-secondary inline-flex items-center">
+                        <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                        Guardar Borrador
+                    </button>
+
+                    <button id="next-btn" onclick="nextStep()" class="elegant-button">
+                        Siguiente
+                    </button>
+
+                    <button id="submit-btn" onclick="submitApplication()" class="elegant-button-gold hidden inline-flex items-center">
+                        <i data-lucide="send" class="h-4 w-4 mr-2"></i>
+                        Enviar Solicitud
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Application state
+        let currentStep = 0;
+        let familyMembers = [];
+        let properties = [];
+        let attachments = {};
+        
+        const steps = ["Datos de Identificación", "Grupo Familiar", "Bienes y Propiedades", "Documentos Anexos", "Revisión y Envío"];
+        
+        const requiredAttachments = [
+            { 
+                key: "anexo1", 
+                name: "Anexo N°1. Fotocopia legible de Cédula", 
+                description: "De identidad de todos los miembros mayores de edad. En caso de menores de edad se debe de presentar Tarjeta de Identificación de Menor o Constancia de Nacimiento de el/la estudiante solicitante a beca y de CADA UNO DE LOS MIEMBROS DEL GRUPO FAMILIAR (que viven con el/la estudiante solicitante). Se aceptan las constancias de nacimiento de los menores descargadas de internet. En caso de extranjeros debe adjuntarse la copia de cedula de residencia al día o DIMEX vigente." 
+            },
+            { 
+                key: "anexo2", 
+                name: "Anexo N°2. Última ORDEN PATRONAL y constancia de SALARIO", 
+                description: "O de PENSIÓN del jefe del hogar, solicitante, padres, hermanos o cónyuge que TIENEN INGRESO ECONÓMICO. En el caso de trabajadores no asegurados y sin patrón, una constancia de salario autenticada por contador autorizado (contador público o privado), o declaración jurada autenticada por un abogado (La constancia de salario que indique el ingreso sin deducciones)." 
+            },
+            { 
+                key: "anexo3", 
+                name: "Anexo N°3. En caso de dedicarse a labores agropecuarias", 
+                description: "(caña, café, leche, palma u otra) debe adjuntar constancia del beneficio(s) cooperativa(s) u otra entidad que certifique la entrega del producto y el ingreso percibido. Con una fecha de emisión de tres meses. Considere que estos ingresos deben sumarse y dividirse entre doce." 
+            },
+            { 
+                key: "anexo4", 
+                name: "Anexo N°4. En caso de que el estudiante solicitante requiera o ha requerido algún tipo de adecuación curricular o de acceso", 
+                description: "Debe presentar un informe técnico del Centro educativo donde certifique dicha condición. Carta razones cree que interfiere en su rendimiento académico" 
+            },
+            { 
+                key: "anexo5", 
+                name: "Anexo N°5. Cartas de despido o renuncia", 
+                description: "En caso que alguno de los integrantes se encuentre en esta situación y una carta donde explica cómo está haciendo económicamente en la actualidad en su condición de desempleo." 
+            },
+            { 
+                key: "anexo6", 
+                name: "Anexo N°6. Constancia de la C.C.S.S. de NO COTIZANTE", 
+                description: "Del estudiante y de los miembros del grupo familiar MAYORES DE EDAD QUE NO TRABAJAN (Esta constancia la solicita en las oficinas centrales de la Caja o Sucursales)." 
+            },
+            { 
+                key: "anexo7", 
+                name: "Anexo N°7. Si algún miembro de la familia recibe algún tipo de pensión", 
+                description: "Debe de presentar una CERTIFICACIÓN donde indique el monto correspondiente emitida por la institución que otorga dicha pensión. En caso de que sea pensión voluntaria debe de presentar una DECLARACIÓN JURADA autenticada por contador autorizado (contador público o privado), o por un abogado. En caso de existir demanda de pensión alimenticia aportar una certificación extendida por el Poder Judicial." 
+            },
+            { 
+                key: "anexo8", 
+                name: "Anexo N°8. En caso viudez u orfandad", 
+                description: "Debe presentar una constancia de RECIBIR o NO PENSIÓN emitida por las Oficinas Centrales de la Caja o Sucursales." 
+            },
+            { 
+                key: "anexo9", 
+                name: "Anexo N°9. En caso de separación de los padres, madres solteras", 
+                description: "Debe presentar una constancia de RECIBIR o NO PENSIÓN emitida por los Tribunales de Justicia." 
+            },
+            { 
+                key: "anexo10", 
+                name: "Anexo N°10. Si el estudiante o algún hermano recibe o ha recibido el beneficio de algún tipo de beca", 
+                description: "Debe presentar una constancia de beca que verifique esa información, además Constancia de estudiante de los hermanos que se encuentren estudiando." 
+            },
+            { 
+                key: "anexo11", 
+                name: "Anexo N°11. Copia de recibo de Impuesto Territorial", 
+                description: "(por las propiedades), impuesto municipal y pago de patentes (Si existieran)." 
+            },
+            { 
+                key: "anexo12", 
+                name: "Anexo N°12. Certificación de los Bienes inmuebles (Propiedades), Bienes Muebles (Vehículos)", 
+                description: "Y números de Cédulas Jurídicas o Sociedades Anónimas QUE POSEAN O NO los padres, el estudiante, hermanos, cónyuge. (DE TODOS LOS MAYORES DE EDAD QUE VIVEN EN EL HOGAR TENGAN O NO TENGAN)." 
+            },
+            { 
+                key: "anexo13", 
+                name: "Anexo N°13. Si posee vehículo", 
+                description: "Adjuntar copia recibo del marchamo." 
+            },
+            { 
+                key: "anexo14", 
+                name: "Anexo N°14. Contrato de arrendamiento y Copia del recibo de pago de alquileres o de hipoteca", 
+                description: "Referida a la casa de habitación en donde reside el estudiante con su familia y la del estudiante si paga alquiler durante el tiempo lectivo. Exponer en una carta si al alquilar en periodo lectivo es dependiente o independiente de la economía del grupo familiar de origen." 
+            },
+            { 
+                key: "anexo15", 
+                name: "Anexo N°15. Constancia médica", 
+                description: "Si algún miembro de la familia padece de enfermedad crónica o discapacidad." 
+            },
+            { 
+                key: "anexo16", 
+                name: "Anexo N°16. En caso de que el/la estudiante solicitante pertenezca a un grupo étnico indígena", 
+                description: "Esta condición debe ser certificada por parte del Consejo Indígena o por el Centro Educativo." 
+            },
+            { 
+                key: "anexo17", 
+                name: "Anexo N°17. Comprobante de pago del formulario de beca", 
+                description: "Comprobante de pago del formulario de beca." 
+            }
+        ];
+
+        // Initialize form with user data
+        function initializeForm() {
+            const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (userData.name) document.getElementById('nombre').value = userData.name;
+            if (userData.cedula) document.getElementById('cedula').value = userData.cedula;
+            if (userData.carnet) document.getElementById('carnet').value = userData.carnet;
+            if (userData.email) document.getElementById('correo').value = userData.email;
+            
+            renderAttachments();
+        }
+
+        // Step navigation
+        function nextStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                updateStep();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                updateStep();
+            }
+        }
+
+        function updateStep() {
+            // Hide all steps
+            document.querySelectorAll('.step-content').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Show current step
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            
+            // Update progress
+            const progress = ((currentStep + 1) / steps.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('step-info').textContent = `Paso ${currentStep + 1} de ${steps.length}: ${steps[currentStep]}`;
+            document.getElementById('progress-percent').textContent = `${Math.round(progress)}% Completado`;
+            
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = currentStep === 0;
+            
+            if (currentStep === steps.length - 1) {
+                document.getElementById('next-btn').classList.add('hidden');
+                document.getElementById('submit-btn').classList.remove('hidden');
+                updateSummary();
+            } else {
+                document.getElementById('next-btn').classList.remove('hidden');
+                document.getElementById('submit-btn').classList.add('hidden');
+            }
+        }
+
+        // Family members management
+        function addFamilyMember() {
+            const id = Date.now().toString();
+            const member = {
+                id: id,
+                cedula: '',
+                nombre: '',
+                apellido1: '',
+                apellido2: '',
+                edad: '',
+                parentesco: '',
+                estadoCivil: '',
+                estudia: false,
+                beca: false,
+                salud: '',
+                ocupacion: '',
+                institucion: '',
+                ingresoMensual: ''
+            };
+            
+            familyMembers.push(member);
+            renderFamilyMembers();
+            calculateTotalIncome();
+        }
+
+        function removeFamilyMember(id) {
+            familyMembers = familyMembers.filter(member => member.id !== id);
+            renderFamilyMembers();
+            calculateTotalIncome();
+        }
+
+        function updateFamilyMember(id, field, value) {
+            const member = familyMembers.find(m => m.id === id);
+            if (member) {
+                member[field] = value;
+                if (field === 'ingresoMensual') {
+                    calculateTotalIncome();
+                }
+            }
+        }
+
+        function renderFamilyMembers() {
+            const container = document.getElementById('family-members-table');
+            container.innerHTML = '';
+            
+            familyMembers.forEach((member, index) => {
+                const row = document.createElement('tr');
+                row.className = 'text-xs';
+                row.innerHTML = `
+                    <td class="px-3 py-4">
+                        <input type="text" value="${member.cedula}" onchange="updateFamilyMember('${member.id}', 'cedula', this.value)" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="text" value="${member.nombre}" onchange="updateFamilyMember('${member.id}', 'nombre', this.value)" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="text" value="${member.apellido1}" onchange="updateFamilyMember('${member.id}', 'apellido1', this.value)" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="text" value="${member.apellido2}" onchange="updateFamilyMember('${member.id}', 'apellido2', this.value)" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="number" value="${member.edad}" onchange="updateFamilyMember('${member.id}', 'edad', this.value)" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="text" value="${member.parentesco}" onchange="updateFamilyMember('${member.id}', 'parentesco', this.value)" placeholder="ej: madre" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="text" value="${member.estadoCivil}" onchange="updateFamilyMember('${member.id}', 'estadoCivil', this.value)" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4 text-center">
+                        <input type="checkbox" ${member.estudia ? 'checked' : ''} onchange="updateFamilyMember('${member.id}', 'estudia', this.checked)" class="h-4 w-4">
+                    </td>
+                    <td class="px-3 py-4 text-center">
+                        <input type="checkbox" ${member.beca ? 'checked' : ''} onchange="updateFamilyMember('${member.id}', 'beca', this.checked)" class="h-4 w-4">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="text" value="${member.salud}" onchange="updateFamilyMember('${member.id}', 'salud', this.value)" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="text" value="${member.ocupacion}" onchange="updateFamilyMember('${member.id}', 'ocupacion', this.value)" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="text" value="${member.institucion}" onchange="updateFamilyMember('${member.id}', 'institucion', this.value)" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="number" value="${member.ingresoMensual}" onchange="updateFamilyMember('${member.id}', 'ingresoMensual', this.value)" placeholder="0" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4 text-center">
+                        <button onclick="removeFamilyMember('${member.id}')" class="text-red-600 hover:text-red-800">
+                            <i data-lucide="trash-2" class="h-5 w-5"></i>
+                        </button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+            
+            // Reinitialize icons
+            lucide.createIcons();
+        }
+
+        // Properties management
+        function addProperty() {
+            const id = Date.now().toString();
+            const property = {
+                id: id,
+                nombrePropietario: '',
+                numeroCedula: '',
+                lotes: '',
+                fincas: '',
+                casasHabitacion: '',
+                casasAlquiler: '',
+                apartamentos: '',
+                vehiculos: ''
+            };
+            
+            properties.push(property);
+            renderProperties();
+        }
+
+        function removeProperty(id) {
+            properties = properties.filter(property => property.id !== id);
+            renderProperties();
+        }
+
+        function updateProperty(id, field, value) {
+            const property = properties.find(p => p.id === id);
+            if (property) {
+                property[field] = value;
+            }
+        }
+
+        function renderProperties() {
+            const container = document.getElementById('properties-table');
+            container.innerHTML = '';
+            
+            properties.forEach((property, index) => {
+                const row = document.createElement('tr');
+                row.className = 'text-xs';
+                row.innerHTML = `
+                    <td class="px-3 py-4">
+                        <input type="text" value="${property.nombrePropietario}" onchange="updateProperty('${property.id}', 'nombrePropietario', this.value)" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="text" value="${property.numeroCedula}" onchange="updateProperty('${property.id}', 'numeroCedula', this.value)" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <textarea value="${property.lotes}" onchange="updateProperty('${property.id}', 'lotes', this.value)" placeholder="Cuántos | Usos | Extensión y Ubicación" class="elegant-input w-full px-3 py-2 text-xs h-20 resize-none">${property.lotes}</textarea>
+                    </td>
+                    <td class="px-3 py-4">
+                        <textarea value="${property.fincas}" onchange="updateProperty('${property.id}', 'fincas', this.value)" placeholder="Cuántos | Usos | Extensión y Ubicación" class="elegant-input w-full px-3 py-2 text-xs h-20 resize-none">${property.fincas}</textarea>
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="text" value="${property.casasHabitacion}" onchange="updateProperty('${property.id}', 'casasHabitacion', this.value)" placeholder="Cuántos" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="text" value="${property.casasAlquiler}" onchange="updateProperty('${property.id}', 'casasAlquiler', this.value)" placeholder="Cuántos" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <input type="text" value="${property.apartamentos}" onchange="updateProperty('${property.id}', 'apartamentos', this.value)" placeholder="Cuántos" class="elegant-input w-full px-3 py-2 text-xs">
+                    </td>
+                    <td class="px-3 py-4">
+                        <textarea value="${property.vehiculos}" onchange="updateProperty('${property.id}', 'vehiculos', this.value)" placeholder="Cuántos y Cuáles" class="elegant-input w-full px-3 py-2 text-xs h-20 resize-none">${property.vehiculos}</textarea>
+                    </td>
+                    <td class="px-3 py-4 text-center">
+                        <button onclick="removeProperty('${property.id}')" class="text-red-600 hover:text-red-800">
+                            <i data-lucide="trash-2" class="h-5 w-5"></i>
+                        </button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+            
+            // Reinitialize icons
+            lucide.createIcons();
+        }
+
+        // Calculate total income
+        function calculateTotalIncome() {
+            let total = 0;
+            
+            // Family members income
+            familyMembers.forEach(member => {
+                const income = parseFloat(member.ingresoMensual) || 0;
+                total += income;
+            });
+            
+            // Other income
+            const ayuda = parseFloat(document.getElementById('ayudaEconomica')?.value) || 0;
+            const alquileres = parseFloat(document.getElementById('ingresosAlquileres')?.value) || 0;
+            const otras = parseFloat(document.getElementById('otrasAyudas')?.value) || 0;
+            
+            total += ayuda + alquileres + otras;
+            
+            document.getElementById('totalIngresos').textContent = total.toLocaleString();
+        }
+
+        // Add event listeners for income calculation
+        document.addEventListener('DOMContentLoaded', function() {
+            ['ayudaEconomica', 'ingresosAlquileres', 'otrasAyudas'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', calculateTotalIncome);
+                }
+            });
+        });
+
+        // Attachments management
+        function renderAttachments() {
+            const container = document.getElementById('attachments');
+            container.innerHTML = '';
+            
+            requiredAttachments.forEach((attachment, index) => {
+                const attachmentDiv = document.createElement('div');
+                attachmentDiv.className = 'elegant-card p-6 mb-4';
+                attachmentDiv.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 pr-4">
+                            <h5 class="font-semibold text-sm mb-2" style="color: var(--university-navy);">${attachment.name}</h5>
+                            <p class="text-xs leading-relaxed" style="color: var(--university-dark-navy);">${attachment.description}</p>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <input type="file" id="${attachment.key}" class="file-input" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileUpload('${attachment.key}', this.files[0])">
+                            <label for="${attachment.key}" class="elegant-button-secondary inline-flex items-center cursor-pointer">
+                                <i data-lucide="upload" class="h-4 w-4 mr-2"></i>
+                                ${attachments[attachment.key] ? 'Cambiar' : 'Subir'}
+                            </label>
+                            ${attachments[attachment.key] ? `<p class="text-xs text-green-600 mt-1">✓ ${attachments[attachment.key].name}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(attachmentDiv);
+            });
+            
+            // Reinitialize icons
+            lucide.createIcons();
+        }
+
+        function handleFileUpload(attachmentKey, file) {
+            if (file) {
+                attachments[attachmentKey] = file;
+                renderAttachments();
+            }
+        }
+
+        // Summary update
+        function updateSummary() {
+            const personalSummary = document.getElementById('personal-summary');
+            const familySummary = document.getElementById('family-summary');
+            
+            const nombre = document.getElementById('nombre').value;
+            const primerApellido = document.getElementById('primerApellido').value;
+            const segundoApellido = document.getElementById('segundoApellido').value;
+            const cedula = document.getElementById('cedula').value;
+            const carnet = document.getElementById('carnet').value;
+            const carrera = document.getElementById('carrera').value;
+            const nivel = document.getElementById('nivel').value;
+            
+            personalSummary.innerHTML = `
+                <p><strong>Nombre:</strong> ${nombre} ${primerApellido} ${segundoApellido}</p>
+                <p><strong>Cédula:</strong> ${cedula}</p>
+                <p><strong>Carnet:</strong> ${carnet}</p>
+                <p><strong>Carrera:</strong> ${carrera}</p>
+                <p><strong>Nivel:</strong> ${nivel}</p>
+            `;
+            
+            const attachedCount = Object.values(attachments).filter(Boolean).length;
+            const totalIncome = document.getElementById('totalIngresos').textContent;
+            
+            familySummary.innerHTML = `
+                <p><strong>Miembros del hogar:</strong> ${familyMembers.length}</p>
+                <p><strong>Propiedades registradas:</strong> ${properties.length}</p>
+                <p><strong>Documentos adjuntos:</strong> ${attachedCount} de ${requiredAttachments.length}</p>
+                <p><strong>Ingresos totales:</strong> ₡${totalIncome}</p>
+            `;
+        }
+
+        // Form actions
+        function saveDraft() {
+            const formData = {
+                currentStep,
+                personalData: {
+                    nombre: document.getElementById('nombre').value,
+                    primerApellido: document.getElementById('primerApellido').value,
+                    segundoApellido: document.getElementById('segundoApellido').value,
+                    cedula: document.getElementById('cedula').value,
+                    nacionalidad: document.getElementById('nacionalidad').value,
+                    carnet: document.getElementById('carnet').value,
+                    sexo: document.querySelector('input[name="sexo"]:checked')?.value || '',
+                    edad: document.getElementById('edad').value,
+                    dia: document.getElementById('dia').value,
+                    mes: document.getElementById('mes').value,
+                    ano: document.getElementById('ano').value,
+                    correo: document.getElementById('correo').value,
+                    telefonoCelular: document.getElementById('telefonoCelular').value,
+                    telefonoDomiciliar: document.getElementById('telefonoDomiciliar').value,
+                    estadoCivil: document.getElementById('estadoCivil').value,
+                    carrera: document.getElementById('carrera').value,
+                    nivel: document.getElementById('nivel').value,
+                    condicionSolicitante: document.querySelector('input[name="condicionSolicitante"]:checked')?.value || '',
+                    provincia: document.getElementById('provincia').value,
+                    canton: document.getElementById('canton').value,
+                    distrito: document.getElementById('distrito').value,
+                    direccionExacta: document.getElementById('direccionExacta').value,
+                    ayudaEconomica: document.getElementById('ayudaEconomica').value,
+                    ingresosAlquileres: document.getElementById('ingresosAlquileres').value,
+                    otrasAyudas: document.getElementById('otrasAyudas').value,
+                    condicionVivienda: document.getElementById('condicionVivienda').value
+                },
+                familyMembers,
+                properties
+            };
+            
+            localStorage.setItem('scholarshipDraft', JSON.stringify(formData));
+            alert('Borrador guardado exitosamente');
+        }
+
+        function submitApplication() {
+            const termsCheckbox = document.getElementById('terms');
+            if (!termsCheckbox.checked) {
+                alert('Debe aceptar los términos y condiciones para continuar');
+                return;
+            }
+            
+            // Collect all form data
+            const applicationData = {
+                personalData: {
+                    nombre: document.getElementById('nombre').value,
+                    primerApellido: document.getElementById('primerApellido').value,
+                    segundoApellido: document.getElementById('segundoApellido').value,
+                    cedula: document.getElementById('cedula').value,
+                    nacionalidad: document.getElementById('nacionalidad').value,
+                    carnet: document.getElementById('carnet').value,
+                    sexo: document.querySelector('input[name="sexo"]:checked')?.value || '',
+                    edad: document.getElementById('edad').value,
+                    dia: document.getElementById('dia').value,
+                    mes: document.getElementById('mes').value,
+                    ano: document.getElementById('ano').value,
+                    correo: document.getElementById('correo').value,
+                    telefonoCelular: document.getElementById('telefonoCelular').value,
+                    telefonoDomiciliar: document.getElementById('telefonoDomiciliar').value,
+                    estadoCivil: document.getElementById('estadoCivil').value,
+                    carrera: document.getElementById('carrera').value,
+                    nivel: document.getElementById('nivel').value,
+                    condicionSolicitante: document.querySelector('input[name="condicionSolicitante"]:checked')?.value || '',
+                    provincia: document.getElementById('provincia').value,
+                    canton: document.getElementById('canton').value,
+                    distrito: document.getElementById('distrito').value,
+                    direccionExacta: document.getElementById('direccionExacta').value,
+                    ayudaEconomica: document.getElementById('ayudaEconomica').value,
+                    ingresosAlquileres: document.getElementById('ingresosAlquileres').value,
+                    otrasAyudas: document.getElementById('otrasAyudas').value,
+                    condicionVivienda: document.getElementById('condicionVivienda').value
+                },
+                familyMembers,
+                properties,
+                attachments: Object.keys(attachments).filter(key => attachments[key])
+            };
+            
+            console.log('Submitting application:', applicationData);
+            
+            // Save application to localStorage (simulate submission)
+            const applications = JSON.parse(localStorage.getItem('scholarshipApplications') || '[]');
+            applications.push({
+                id: Date.now().toString(),
+                ...applicationData,
+                status: 'En Revisión',
+                submittedAt: new Date().toISOString(),
+                lastUpdated: new Date().toISOString()
+            });
+            localStorage.setItem('scholarshipApplications', JSON.stringify(applications));
+            
+            // Clear draft
+            localStorage.removeItem('scholarshipDraft');
+            
+            alert('Solicitud enviada exitosamente. Recibirás una confirmación por correo electrónico.');
+            window.location.href = 'estudiante.html';
+        }
+
+        // Load draft if exists
+        function loadDraft() {
+            const draft = localStorage.getItem('scholarshipDraft');
+            if (draft) {
+                const data = JSON.parse(draft);
+                
+                // Load personal data
+                Object.keys(data.personalData).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        if (element.type === 'radio') {
+                            const radio = document.querySelector(`input[name="${key}"][value="${data.personalData[key]}"]`);
+                            if (radio) radio.checked = true;
+                        } else {
+                            element.value = data.personalData[key];
+                        }
+                    }
+                });
+                
+                // Load family members and properties
+                familyMembers = data.familyMembers || [];
+                properties = data.properties || [];
+                
+                // Set current step
+                currentStep = data.currentStep || 0;
+                updateStep();
+                renderFamilyMembers();
+                renderProperties();
+                calculateTotalIncome();
+            }
+        }
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeForm();
+            loadDraft();
+        });
+    </script>
+</body>
+</html>

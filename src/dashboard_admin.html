@@ -304,12 +304,16 @@
                     </div>
                     
                     ${solicitud.estado === 'aprobada' ? `
-                        <div class="bg-green-50 p-4 rounded-lg">
-                            <h4 class="font-medium text-green-800 mb-2">Beca Aprobada</h4>
-                            <p class="text-sm text-green-700 mb-1">Monto: ₡${solicitud.montoAprobado?.toLocaleString() || '0'}</p>
-                            <p class="text-sm text-green-700">Motivo: ${solicitud.motivoDecision || 'No especificado'}</p>
-                        </div>
-                    ` : ''}
+  <div class="bg-green-50 p-4 rounded-lg">
+    <h4 class="font-medium text-green-800 mb-2">Beca Aprobada</h4>
+    <p class="text-sm text-green-700 mb-1">Monto: ₡${solicitud.montoAprobado?.toLocaleString() || '0'}</p>
+    ${solicitud.beca ? `
+      <p class="text-sm text-green-700 mb-1">Plazo: ${solicitud.beca.plazo} meses</p>
+      <p class="text-sm text-green-700 mb-1">Fecha de vencimiento: ${new Date(solicitud.beca.fechaVencimiento).toLocaleDateString()}</p>
+    ` : ''}
+    <p class="text-sm text-green-700">Motivo: ${solicitud.motivoDecision || 'No especificado'}</p>
+  </div>
+` : ''}
                     
                     ${solicitud.estado === 'rechazada' ? `
                         <div class="bg-red-50 p-4 rounded-lg">
@@ -389,49 +393,67 @@
 
     // Funciones para cambiar estado
     async function aprobarSolicitud(id) {
-        const monto = prompt('Ingrese el monto de la beca:');
-        if (monto && !isNaN(monto)) {
-            const motivo = prompt('Ingrese el motivo de aprobación:', 'Cumple con todos los requisitos socioeconómicos');
-            
-            try {
-                await updateSolicitud(id, 'aprobada', parseFloat(monto), motivo);
-                
-                // Crear la beca automáticamente
-                const plazo = new Date();
-                plazo.setFullYear(plazo.getFullYear() + 1); // Plazo de 1 año
-                
-                // Necesitamos obtener el idEstudiante primero
-                const response = await fetch(`/api/solicitudes/${id}`);
-                if (!response.ok) throw new Error('Error al obtener datos de la solicitud');
-                const solicitud = await response.json();
-                
-                await createBeca(solicitud.idEstudiante, parseFloat(monto), plazo);
-                
-                closeModal();
-                await renderSolicitudes();
-                alert('Solicitud aprobada y beca creada exitosamente');
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al aprobar solicitud: ' + error.message);
-            }
-        }
+  const monto = prompt('Ingrese el monto de la beca:');
+  if (monto && !isNaN(monto)) {
+    const plazoMeses = prompt('Ingrese el plazo de la beca en meses (ej. 12 para 1 año):', '12');
+    const motivo = prompt('Ingrese el motivo de aprobación:', 'Cumple con todos los requisitos socioeconómicos');
+    
+    if (!motivo || !plazoMeses || isNaN(plazoMeses)) {
+      alert('Debe ingresar un motivo y un plazo válido');
+      return;
     }
-
-    async function rechazarSolicitud(id) {
-        const motivo = prompt('Ingrese el motivo del rechazo:');
-        if (motivo) {
-            try {
-                await updateSolicitud(id, 'rechazada', null, motivo);
-                closeModal();
-                await renderSolicitudes();
-                alert('Solicitud rechazada');
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al rechazar solicitud: ' + error.message);
-            }
-        }
+    
+    try {
+      // Actualizar estado de la solicitud
+      await updateSolicitud(id, 'aprobada', parseFloat(monto), motivo);
+      
+      // Obtener datos del estudiante para crear la beca
+      const response = await fetch(`/api/solicitudes/${id}`);
+      if (!response.ok) throw new Error('Error al obtener datos de la solicitud');
+      const solicitud = await response.json();
+      
+      // Crear la beca con el plazo especificado
+      const becaResponse = await fetch('/api/becas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          idEstudiante: solicitud.idEstudiante, 
+          monto: parseFloat(monto), 
+          plazoMeses: parseInt(plazoMeses)
+        })
+      });
+      
+      if (!becaResponse.ok) throw new Error('Error al crear beca');
+      
+      const becaData = await becaResponse.json();
+      closeModal();
+      await renderSolicitudes();
+      alert(`Solicitud aprobada. Beca de ₡${monto} por ${plazoMeses} meses creada. Vence el ${new Date(becaData.fechaVencimiento).toLocaleDateString()}`);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al aprobar solicitud: ' + error.message);
     }
+  } else {
+    alert('Debe ingresar un monto válido');
+  }
+}
 
+async function rechazarSolicitud(id) {
+    const motivo = prompt('Ingrese el motivo del rechazo:');
+    if (motivo) {
+        try {
+            await updateSolicitud(id, 'rechazada', null, motivo);
+            closeModal();
+            await renderSolicitudes();
+            alert('Solicitud rechazada');
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al rechazar solicitud: ' + error.message);
+        }
+    } else {
+        alert('Debe ingresar un motivo de rechazo');
+    }
+}
     async function cambiarEstado(id, nuevoEstado) {
         try {
             await updateSolicitud(id, nuevoEstado, null, null);
