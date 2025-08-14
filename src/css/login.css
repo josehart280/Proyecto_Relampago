@@ -1,147 +1,107 @@
 /* Estilos generales */
 body {
+    background: linear-gradient(135deg, #6EE7B7, #3B82F6); /* Fondo de gradiente agradable */
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(to bottom right, #ebf8ff, #a3b8f4); /* Fondo degradado */
-    color: #333;
     margin: 0;
     padding: 0;
-}
-
-/* Centrado de la página */
-.flex {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.min-h-screen {
-    min-height: 100vh;
-}
-
-.container {
-    max-width: 100%;
+/* Contenedor principal */
+.w-full {
+    max-width: 400px; /* Ajustado para un tamaño más pequeño */
+    width: 100%;
     padding: 20px;
-}
-
-/* Estilos para la tarjeta de login */
-.bg-white {
-    background-color: white;
-}
-
-.p-6 {
-    padding: 20px;
-}
-
-.rounded-lg {
-    border-radius: 10px;
-}
-
-.shadow-lg {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.text-center {
-    text-align: center;
-}
-
-.mb-6 {
-    margin-bottom: 24px;
-}
-
-.mb-4 {
-    margin-bottom: 16px;
-}
-
-/* Estilos de los encabezados */
-h2 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
-}
-
-p {
-    color: #777;
-}
-
-/* Estilos para el formulario */
-form {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 16px;
 }
 
+/* Campos de entrada (ID y Contraseña) */
 input {
-    padding: 12px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    width: 100%;
+    padding: 8px;  /* Reducido para hacerlo más pequeño */
+    margin: 10px 0;
+    font-size: 14px;
+    border: 2px solid #E5E7EB;
+    border-radius: 6px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box; /* Esto asegura que el padding no haga que se desborde */
+    max-width: 100%; /* Limitar el tamaño al 100% del contenedor */
 }
 
 input:focus {
-    border-color: #4CAF50;
+    border-color: #10B981; /* Cambia el borde a verde cuando el campo es enfocado */
     outline: none;
 }
 
-label {
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-/* Estilos para los botones */
+/* Botones */
 button {
-    padding: 15px;
-    font-size: 1.1rem;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #2D6A4F;  /* Un color más oscuro al pasar el mouse */
 }
 
-.bg-green-600 {
-    background-color: #4CAF50;
-    color: white;
+button.bg-green-600 {
+    background-color: #10B981; /* Verde bonito */
+    color: #fff;
 }
 
-.bg-green-600:hover {
-    background-color: #45a049;
+button.bg-green-600:hover {
+    background-color: #059669; /* Un verde más oscuro cuando se pasa el mouse */
 }
 
-/* Estilos para los mensajes de error */
+button.bg-transparent {
+    background: transparent;
+    border: 2px solid #10B981;
+    color: #10B981;
+}
+
+button.bg-transparent:hover {
+    background-color: #A7F3D0;
+}
+
+/* Mensaje de error */
 #errorMessage {
-    background-color: #ffcccc;
-    color: #e74c3c;
+    display: none;
+    background-color: #FEE2E2;
+    color: #B91C1C;
     padding: 10px;
-    border-radius: 5px;
-    font-size: 1rem;
+    border-radius: 6px;
+    margin-top: 15px;
 }
 
-#errorText {
-    margin: 0;
+#errorMessage.show {
+    display: block;
 }
 
-/* Enlaces */
+/* Estilos para el contenedor de "Volver al inicio" */
 a {
-    color: #4CAF50;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    color: #10B981;
     text-decoration: none;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
 }
 
 a:hover {
-    text-decoration: underline;
-}
-
-/* Estilos responsivos */
-@media (max-width: 768px) {
-    .max-w-md {
-        max-width: 90%;
-    }
-}
-
-@media (min-width: 768px) {
-    .max-w-md {
-        max-width: 400px;
-    }
+    background-color: #E0F2F1;
 }
