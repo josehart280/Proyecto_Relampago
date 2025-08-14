@@ -1,57 +1,57 @@
 const express = require('express');
 const path = require('path');
-const mysql = require('mysql2'); // Importar mysql2
-require('dotenv').config(); // Cargar las variables de entorno desde el archivo .env
-
+const cors = require('cors'); // Importamos CORS
+const { sql, connectToDatabase } = require('./db'); // Importar la conexión a la base de datos
 const app = express();
 
 // Usar CORS para permitir solicitudes desde cualquier origen
-const cors = require('cors');
-app.use(cors());
+app.use(cors());  // Esto habilita CORS para todas las rutas
 
 // Middlewares básicos
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'src')));
 
-// Crear una conexión a la base de datos usando las variables de entorno
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,        // Host de la base de datos
-  port: process.env.DB_PORT,        // Puerto de la base de datos
-  user: process.env.DB_USER,        // Usuario de la base de datos
-  password: process.env.DB_PASSWORD, // Contraseña de la base de datos
-  database: process.env.DB_DATABASE, // Nombre de la base de datos
-  connectionLimit: process.env.DB_CONNECTION_LIMIT, // Límites de conexiones al pool
+// Conectar a la base de datos
+connectToDatabase();
+
+// Ruta para el frontend
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'index.html'));
 });
 
-// Función para llamar al procedimiento almacenado
-function loginUsuario(idUsuario, passUsuario, callback) {
-  const sql = 'CALL login_usuario(?, ?)';  // Procedimiento para ID de usuario
-  pool.query(sql, [idUsuario, passUsuario], (err, results) => {
-    if (err) {
-      console.error('Error al ejecutar el procedimiento almacenado:', err);
-      return callback(err, null);
-    }
-    callback(null, results[0][0].resultado); // Devolvemos el resultado del procedimiento almacenado
-  });
-}
-
-// Ruta para el login
-app.post('/login', (req, res) => {
+// Ruta para manejar el login
+app.post('/login', async (req, res) => {
   const { login, passUsuario } = req.body;
 
-  // Llamamos al procedimiento almacenado para verificar las credenciales
-  loginUsuario(login, passUsuario, (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: 'Hubo un error en el login' });
-    }
+  try {
+    const result = await sql.query`EXEC ProyectoRelampago.login_usuario @p_idUsuario=${login}, @p_passUsuario=${passUsuario}`;
 
-    if (result.includes('Redirigiendo')) {
-      res.json({ message: result }); // Si la credencial es correcta, respondemos con un mensaje de redirección
+    if (result.recordset && result.recordset.length > 0) {
+      const mensaje = result.recordset[0].resultado;
+
+      if (mensaje.includes('Redirigiendo')) {
+        res.json({ message: mensaje });
+      } else {
+        res.status(401).json({ message: mensaje });
+      }
     } else {
-      res.status(401).json({ message: result }); // Si el login falla, respondemos con un mensaje de error
+      res.status(401).json({ message: 'Credenciales incorrectas' });
     }
-  });
+  } catch (err) {
+    console.error("Error al ejecutar el procedimiento almacenado:", err);
+    res.status(500).json({ message: 'Error en el servidor' });
+  }
 });
 
-module.exports = app; // Exportamos la instancia de Express para usarla en server.js
+// Manejo de errores simple
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Algo salió mal!');
+});
+
+// Iniciar el servidor
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Servidor corriendo en el puerto ${port}`);
+});
